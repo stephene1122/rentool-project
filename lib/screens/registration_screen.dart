@@ -29,7 +29,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         autofocus: false,
         controller: fullNameEditingController,
         keyboardType: TextInputType.name,
-        //validator: (){},
+        validator: (value) {
+          RegExp regex = new RegExp(r'^.{6,}$');
+          if (value!.isEmpty) {
+            return ("Fullname cannot be empty");
+          }
+          if (!regex.hasMatch(value)) {
+            return ("Please enter valid name(Min. 6 Character)");
+          }
+          return null;
+        },
         onSaved: (value) {
           fullNameEditingController.text = value!;
         },
@@ -52,7 +61,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         autofocus: false,
         controller: birthDateEditingController,
         keyboardType: TextInputType.datetime,
-        //validator: (){},
+        validator: (value) {
+          RegExp regex = new RegExp(r'^.{10,}$');
+          if (value!.isEmpty) {
+            return ("Fullname cannot be empty");
+          }
+          if (!regex.hasMatch(value)) {
+            return ("Please enter valid birthdate(Min. 10 Character)");
+          }
+          return null;
+        },
         onSaved: (value) {
           birthDateEditingController.text = value!;
         },
@@ -75,7 +93,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         autofocus: false,
         controller: genderEditingController,
         keyboardType: TextInputType.name,
-        //validator: (){},
+        validator: (value) {
+          RegExp regex = new RegExp(r'^.{6,}$');
+          if (value!.isEmpty) {
+            return ("Fullname cannot be empty");
+          }
+          if (!regex.hasMatch(value)) {
+            return ("Please enter valid gender(Exp. Male or Female)");
+          }
+          return null;
+        },
         onSaved: (value) {
           genderEditingController.text = value!;
         },
@@ -98,7 +125,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         autofocus: false,
         controller: homeAddressEditingController,
         keyboardType: TextInputType.emailAddress,
-        //validator: (){},
+        validator: (value) {
+          if (value!.isEmpty) {
+            return ("Fullname cannot be empty");
+          }
+          return null;
+        },
         onSaved: (value) {
           homeAddressEditingController.text = value!;
         },
@@ -144,7 +176,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         autofocus: false,
         controller: emailAddressEditingController,
         keyboardType: TextInputType.emailAddress,
-        //validator: (){},
+        validator: (value) {
+          RegExp regex = new RegExp(r'^.{8,}$');
+          if (value!.isEmpty) {
+            return ("Fullname cannot be empty");
+          }
+          if (!regex.hasMatch(value)) {
+            return ("Please enter valid name(Min. 8 Character)");
+          }
+          return null;
+        },
         onSaved: (value) {
           emailAddressEditingController.text = value!;
         },
@@ -167,7 +208,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         autofocus: false,
         controller: passwordEditingController,
         obscureText: true,
-        //validator: (){},
+        validator: (value) {
+          RegExp regex = new RegExp(r'^.{6,}$');
+          if (value!.isEmpty) {
+            return ("Password is required for login");
+          }
+          if (!regex.hasMatch(value)) {
+            return ("Please enter valid password(Min. 6 Character)");
+          }
+        },
         onSaved: (value) {
           passwordEditingController.text = value!;
         },
@@ -304,5 +353,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             ),
           ),
         ));
+  }
+
+  void singnUpFunction(String email, String password) {
+    if (_formKey.currentState!.validate()) {}
   }
 }

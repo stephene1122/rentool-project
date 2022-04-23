@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "301231671798",
+    "project_id": "rentool-project",
+    "storage_bucket": "rentool-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:301231671798:android:a4a02858dd4f156c535fd7",
+        "android_client_info": {
+          "package_name": "com.example.rentool"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "301231671798-pctl0i1a15fqvjcv52q5ac4em9f82rsk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.rentool",
+            "certificate_hash": "4b27bd8095bcf7a5fcc6ad51ea58c0a401554e38"
+          }
+        },
+        {
+          "client_id": "301231671798-b1ai6sbk6t8fqmrcmjf55pnv8f2em28k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAL5gxRdx7QRAP0_KVSpko9dPTmQ90Ck3o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "301231671798-b1ai6sbk6t8fqmrcmjf55pnv8f2em28k.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "301231671798-vn2bnchscmm1hvmsu74dn44dlrds2tkc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.rentool"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
