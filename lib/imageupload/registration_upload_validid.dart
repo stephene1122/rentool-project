@@ -53,7 +53,7 @@ class _UploadValidIdState extends State<UploadValidId> {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     Reference ref = FirebaseStorage.instance
         .ref()
-        .child("${widget.userId}/images")
+        .child("${widget.userId}/images/user_validid")
         .child("post_$postID");
     await ref.putFile(_image!);
     downloadURL = await ref.getDownloadURL();

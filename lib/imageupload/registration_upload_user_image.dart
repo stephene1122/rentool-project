@@ -53,7 +53,7 @@ class _UploadUserImageState extends State<UploadUserImage> {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     Reference ref = FirebaseStorage.instance
         .ref()
-        .child("${widget.userId}/images")
+        .child("${widget.userId}/images/user_selfie")
         .child("post_$postID");
     await ref.putFile(_image!);
     downloadURL = await ref.getDownloadURL();
@@ -170,7 +170,8 @@ class _UploadUserImageState extends State<UploadUserImage> {
               Expanded(
                 child: _image == null
                     ? SizedBox(
-                        height: 140, child: Image.asset("assets/id-image.png"))
+                        height: 140,
+                        child: Image.asset("assets/square-image.png"))
                     : Image.file(_image!),
               ),
               SizedBox(

@@ -31,6 +31,6 @@ class MyApp extends StatelessWidget {
           // is not restarted.
           primarySwatch: buildMaterialColor(Color(0xFFC35E12)),
         ),
-        home: RegistrationScreenNotif());
+        home: LoginScreen());
   }
 }
