@@ -1,6 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rentool/buildmaterialcolor.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:rentool/imageupload/registration_upload_validid.dart';
+import 'package:rentool/model/user_model.dart';
+import 'package:rentool/screens/home_screen.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
@@ -10,6 +16,8 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
+  final _auth = FirebaseAuth.instance;
+
   // our form key
   final _formKey = GlobalKey<FormState>();
   // editing controller
@@ -64,7 +72,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         validator: (value) {
           RegExp regex = new RegExp(r'^.{10,}$');
           if (value!.isEmpty) {
-            return ("Fullname cannot be empty");
+            return ("Birthdate cannot be empty");
           }
           if (!regex.hasMatch(value)) {
             return ("Please enter valid birthdate(Min. 10 Character)");
@@ -96,7 +104,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         validator: (value) {
           RegExp regex = new RegExp(r'^.{6,}$');
           if (value!.isEmpty) {
-            return ("Fullname cannot be empty");
+            return ("Gender cannot be empty");
           }
           if (!regex.hasMatch(value)) {
             return ("Please enter valid gender(Exp. Male or Female)");
@@ -127,7 +135,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         keyboardType: TextInputType.emailAddress,
         validator: (value) {
           if (value!.isEmpty) {
-            return ("Fullname cannot be empty");
+            return ("Home address cannot be empty");
           }
           return null;
         },
@@ -153,7 +161,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         autofocus: false,
         controller: contactNumberEditingController,
         keyboardType: TextInputType.phone,
-        //validator: (){},
+        validator: (value) {
+          RegExp regex = new RegExp(r'^.{11,}$');
+          if (value!.isEmpty) {
+            return ("Contact number cannot be empty");
+          }
+          if (!regex.hasMatch(value)) {
+            return ("Please enter valid gender(Exp. Male or Female)");
+          }
+          return null;
+        },
         onSaved: (value) {
           contactNumberEditingController.text = value!;
         },
@@ -179,7 +196,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         validator: (value) {
           RegExp regex = new RegExp(r'^.{8,}$');
           if (value!.isEmpty) {
-            return ("Fullname cannot be empty");
+            return ("Email address cannot be empty");
           }
           if (!regex.hasMatch(value)) {
             return ("Please enter valid name(Min. 8 Character)");
@@ -211,7 +228,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         validator: (value) {
           RegExp regex = new RegExp(r'^.{6,}$');
           if (value!.isEmpty) {
-            return ("Password is required for login");
+            return ("Password cannot be empty");
           }
           if (!regex.hasMatch(value)) {
             return ("Please enter valid password(Min. 6 Character)");
@@ -239,7 +256,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         autofocus: false,
         controller: confirmPasswordEditingController,
         obscureText: true,
-        //validator: (){},
+        validator: (value) {
+          if (confirmPasswordEditingController.text !=
+              passwordEditingController.text) {
+            return "Password don't match";
+          }
+          return null;
+        },
         onSaved: (value) {
           confirmPasswordEditingController.text = value!;
         },
@@ -265,7 +288,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         child: MaterialButton(
           padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: MediaQuery.of(context).size.width,
-          onPressed: () {},
+          onPressed: () {
+            singnUpFunction(emailAddressEditingController.text,
+                passwordEditingController.text);
+          },
           child: Text(
             "Next",
             textAlign: TextAlign.center,
@@ -355,7 +381,44 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         ));
   }
 
-  void singnUpFunction(String email, String password) {
-    if (_formKey.currentState!.validate()) {}
+  void singnUpFunction(String email, String password) async {
+    if (_formKey.currentState!.validate()) {
+      await _auth
+          .createUserWithEmailAndPassword(email: email, password: password)
+          .then((value) => {postDetailsToFirestore()})
+          .catchError((e) {
+        Fluttertoast.showToast(msg: e!.message);
+      });
+    }
+  }
+
+  postDetailsToFirestore() async {
+    // calling our firestore
+    // calling our user model
+    // sending these values
+
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    User? user = _auth.currentUser;
+
+    UserModel userModel = UserModel();
+    // writing all the values
+    userModel.emailAddress = user!.email;
+    userModel.uid = user.uid;
+    userModel.fullName = fullNameEditingController.text;
+    userModel.birthDate = birthDateEditingController.text;
+    userModel.gender = genderEditingController.text;
+    userModel.homeAddress = homeAddressEditingController.text;
+    userModel.contactNumber = contactNumberEditingController.text;
+
+    await firebaseFirestore
+        .collection("users")
+        .doc(user.uid)
+        .set(userModel.toMap());
+    Fluttertoast.showToast(msg: "Account created successfully");
+    Navigator.pushAndRemoveUntil(
+        (context),
+        MaterialPageRoute(
+            builder: (context) => UploadValidId(userId: userModel.uid)),
+        (route) => false);
   }
 }
