@@ -62,8 +62,11 @@ class _UploadValidIdState extends State<UploadValidId> {
     await firebaseFirestore
         .collection("users")
         .doc(widget.userId)
-        .collection("images")
-        .add({'downloadURL': downloadURL}).whenComplete(() =>
+        .collection("images-user-validid")
+        .add({
+      'downloadURL': downloadURL,
+      'dateCreated': DateTime.now()
+    }).whenComplete(() =>
             showSnackBar("Image uploaded successfully", Duration(seconds: 2)));
   }
 

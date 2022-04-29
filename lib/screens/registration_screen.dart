@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -6,7 +7,7 @@ import 'package:rentool/buildmaterialcolor.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/imageupload/registration_upload_validid.dart';
 import 'package:rentool/model/user_model.dart';
-import 'package:rentool/screens/home_screen.dart';
+import 'package:intl/intl.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
@@ -30,8 +31,29 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final passwordEditingController = new TextEditingController();
   final confirmPasswordEditingController = new TextEditingController();
 
+  // show date picker and format date
+  Future _selectDate() async {
+    DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: new DateTime.now(),
+        firstDate: new DateTime(1990),
+        lastDate: new DateTime(2030));
+    if (picked != null)
+      setState(() => {
+            birthDateEditingController.text =
+                DateFormat("MM-dd-yyyy").format(picked)
+          });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final List<String> genderItems = [
+      'Male',
+      'Female',
+    ];
+
+    String? _selectedValue;
+
     // fullName field
     final fullNameField = TextFormField(
         autofocus: false,
@@ -66,21 +88,23 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
     // birthDate field
     final birthDateField = TextFormField(
-        autofocus: false,
-        controller: birthDateEditingController,
+        // focusNode: _focusNode,
         keyboardType: TextInputType.datetime,
-        validator: (value) {
-          RegExp regex = new RegExp(r'^.{10,}$');
-          if (value!.isEmpty) {
-            return ("Birthdate cannot be empty");
-          }
-          if (!regex.hasMatch(value)) {
-            return ("Please enter valid birthdate(Min. 10 Character)");
-          }
-          return null;
-        },
+        autocorrect: false,
+        controller: birthDateEditingController,
         onSaved: (value) {
           birthDateEditingController.text = value!;
+        },
+        onTap: () {
+          _selectDate();
+          FocusScope.of(context).requestFocus(new FocusNode());
+        },
+        maxLines: 1,
+        //initialValue: 'Aseem Wangoo',
+        validator: (value) {
+          if (value!.isEmpty || value.length < 1) {
+            return 'Birthdate cannot be empty';
+          }
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
@@ -90,43 +114,56 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             ),
             prefixIcon: Icon(Icons.calendar_month),
             contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-            hintText: "Month/Day/Year",
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
             ),
             labelText: "Birthdate"));
 
     // gender field
-    final genderField = TextFormField(
-        autofocus: false,
-        controller: genderEditingController,
-        keyboardType: TextInputType.name,
-        validator: (value) {
-          RegExp regex = new RegExp(r'^.{6,}$');
-          if (value!.isEmpty) {
-            return ("Gender cannot be empty");
-          }
-          if (!regex.hasMatch(value)) {
-            return ("Please enter valid gender(Exp. Male or Female)");
-          }
-          return null;
-        },
-        onSaved: (value) {
-          genderEditingController.text = value!;
-        },
-        textInputAction: TextInputAction.next,
-        decoration: InputDecoration(
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                  color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
-            ),
-            prefixIcon: Icon(Icons.people),
-            contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-            hintText: "Male / Female",
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
-            ),
-            labelText: "Gender"));
+    final genderField = DropdownButtonFormField2(
+      decoration: InputDecoration(
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+                color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
+          ),
+          prefixIcon: Icon(Icons.people),
+          contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(6),
+          ),
+          labelText: "Gender"),
+      // icon: const Icon(
+      //   Icons.arrow_drop_down,
+      //   color: Colors.black45,
+      // ),
+      iconSize: 20,
+      buttonPadding: const EdgeInsets.only(left: 20, right: 10),
+      dropdownDecoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      items: genderItems
+          .map((item) => DropdownMenuItem<String>(
+                value: item,
+                child: Text(
+                  item,
+                  style: const TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
+              ))
+          .toList(),
+      validator: (value) {
+        if (value == null) {
+          return 'Gender cannot be empty';
+        }
+      },
+      onChanged: (String? newValue) {
+        // update data when value change
+        setState(() {
+          genderEditingController.text = newValue.toString();
+        });
+      },
+    );
 
     // homeAddress field
     final homeAddressField = TextFormField(

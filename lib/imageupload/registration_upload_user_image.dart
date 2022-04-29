@@ -62,8 +62,11 @@ class _UploadUserImageState extends State<UploadUserImage> {
     await firebaseFirestore
         .collection("users")
         .doc(widget.userId)
-        .collection("images")
-        .add({'downloadURL': downloadURL}).whenComplete(() =>
+        .collection("images-user-selfie")
+        .add({
+      'downloadURL': downloadURL,
+      'dateCreated': DateTime.now()
+    }).whenComplete(() =>
             showSnackBar("Image uploaded successfully", Duration(seconds: 2)));
   }
 
@@ -141,6 +144,7 @@ class _UploadUserImageState extends State<UploadUserImage> {
                 fontSize: 15, color: Colors.white, fontWeight: FontWeight.w600),
           ),
         ));
+
     return Scaffold(
       appBar: AppBar(title: const Text("Image Upload")),
       body: Center(

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/screens/login_screen.dart';
@@ -57,8 +58,9 @@ class _RegistrationScreenNotifState extends State<RegistrationScreenNotif> {
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()));
+                  // Navigator.push(context,
+                  //     MaterialPageRoute(builder: (context) => LoginScreen()));
+                  logout(context);
                 },
                 child: Text(
                   "Click here to process",
@@ -73,5 +75,11 @@ class _RegistrationScreenNotifState extends State<RegistrationScreenNotif> {
         ),
       ),
     );
+  }
+
+  Future<void> logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => LoginScreen()));
   }
 }

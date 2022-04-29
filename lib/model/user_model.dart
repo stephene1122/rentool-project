@@ -37,7 +37,8 @@ class UserModel {
       'gender': gender,
       'homeAddress': homeAddress,
       'contactNumber': contactNumber,
-      'emailAddress': emailAddress
+      'emailAddress': emailAddress,
+      'dateCreated': DateTime.now()
     };
   }
 }
