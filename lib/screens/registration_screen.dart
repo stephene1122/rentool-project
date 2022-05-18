@@ -78,8 +78,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               borderSide: BorderSide(
                   color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
             ),
-            prefixIcon: Icon(Icons.account_circle),
-            contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+            prefixIcon: const Icon(Icons.account_circle),
+            contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             hintText: "Ex. Rodrigo R. Duterte",
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
@@ -112,8 +112,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               borderSide: BorderSide(
                   color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
             ),
-            prefixIcon: Icon(Icons.calendar_month),
-            contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+            prefixIcon: const Icon(Icons.calendar_month),
+            contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
             ),
@@ -126,8 +126,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             borderSide: BorderSide(
                 color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
           ),
-          prefixIcon: Icon(Icons.people),
-          contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+          prefixIcon: const Icon(Icons.people),
+          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(6),
           ),
@@ -169,7 +169,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     final homeAddressField = TextFormField(
         autofocus: false,
         controller: homeAddressEditingController,
-        keyboardType: TextInputType.emailAddress,
+        keyboardType: TextInputType.name,
         validator: (value) {
           if (value!.isEmpty) {
             return ("Home address cannot be empty");
@@ -185,8 +185,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               borderSide: BorderSide(
                   color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
             ),
-            prefixIcon: Icon(Icons.home),
-            contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+            prefixIcon: const Icon(Icons.home),
+            contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             hintText: "Ex. Purok 1, Salvacion Panabo City",
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
@@ -217,8 +217,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               borderSide: BorderSide(
                   color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
             ),
-            prefixIcon: Icon(Icons.phone_android),
-            contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+            prefixIcon: const Icon(Icons.phone_android),
+            contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             hintText: "Ex. 09127010539",
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
@@ -247,10 +247,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         decoration: InputDecoration(
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(
-                  color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
+                  color: buildMaterialColor(const Color(0xFFC35E12)),
+                  width: 2.0),
             ),
-            prefixIcon: Icon(Icons.email),
-            contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+            prefixIcon: const Icon(Icons.email),
+            contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             hintText: "Ex. rodrigoduterte@gmail.com",
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
@@ -278,10 +279,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         decoration: InputDecoration(
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(
-                  color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
+                  color: buildMaterialColor(const Color(0xFFC35E12)),
+                  width: 2.0),
             ),
-            prefixIcon: Icon(Icons.vpn_key),
-            contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+            prefixIcon: const Icon(Icons.vpn_key),
+            contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             // hintText: "Password",
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
@@ -307,10 +309,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         decoration: InputDecoration(
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(
-                  color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
+                  color: buildMaterialColor(const Color(0xFFC35E12)),
+                  width: 2.0),
             ),
-            prefixIcon: Icon(Icons.vpn_key),
-            contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+            prefixIcon: const Icon(Icons.vpn_key),
+            contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             hintText: "Re-enter your password",
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
@@ -323,13 +326,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         borderRadius: BorderRadius.circular(6),
         color: HexColor("#C35E12"),
         child: MaterialButton(
-          padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+          padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: MediaQuery.of(context).size.width,
           onPressed: () {
             singnUpFunction(emailAddressEditingController.text,
                 passwordEditingController.text);
           },
-          child: Text(
+          child: const Text(
             "Next",
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -371,42 +374,42 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             fit: BoxFit.contain,
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         fullNameField,
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         birthDateField,
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         genderField,
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         homeAddressField,
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         contactNumberField,
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         emailAddressField,
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         passwordField,
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         confirmPasswordField,
-                        SizedBox(
+                        const SizedBox(
                           height: 25,
                         ),
                         nextBtn,

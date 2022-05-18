@@ -20,6 +20,22 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
   User? user = FirebaseAuth.instance.currentUser;
   UserModel loggedInUser = UserModel();
 
+// Stream for the users images
+  Stream<QuerySnapshot> getUserSelfieStreamSnapshot(
+      BuildContext context) async* {
+    yield* FirebaseFirestore.instance
+        .collection("users")
+        .doc(loggedInUser.uid)
+        .collection("images-user-selfie")
+        .snapshots();
+  }
+
+  final Stream<QuerySnapshot> usersSelfie = FirebaseFirestore.instance
+      .collection("users")
+      .doc()
+      .collection("images-user-selfie")
+      .snapshots();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -30,7 +46,7 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
         .get()
         .then((value) {
       this.loggedInUser = UserModel.fromMap(value.data());
-      setState(() {});
+      // setState(() {});
     });
   }
 
@@ -45,13 +61,13 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
           padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: 265,
           onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        UploadValidId(userId: loggedInUser.uid)));
+            // Navigator.push(
+            //     context,
+            //     MaterialPageRoute(
+            //         builder: (context) =>
+            //             UploadValidId(userId: loggedInUser.uid)));
           },
-          child: Text(
+          child: const Text(
             "Borrowed Items",
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -65,17 +81,16 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
         borderRadius: BorderRadius.circular(6),
         color: HexColor("#C35E12"),
         child: MaterialButton(
-          padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+          padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: 265,
           onPressed: () {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => LendedItems(
-                          userId: loggedInUser.uid,
-                        )));
+                    builder: (context) =>
+                        LendedItems(userId: loggedInUser.uid)));
           },
-          child: Text(
+          child: const Text(
             "Lended Items",
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -83,27 +98,25 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
           ),
         ));
 
+    // get selfie image url
     final userImage = StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection("users")
           .doc(loggedInUser.uid)
-          .collection("images")
+          .collection("images-user-selfie")
+          .limit(1)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) {
           return SizedBox(
               height: 80, child: Image.asset("assets/square-image.png"));
         } else {
-          return ListView.builder(
-              itemCount: snapshot.data!.docs.length,
-              itemBuilder: (BuildContext context, int index) {
-                String url = snapshot.data!.docs[index]['downloadURL'];
-                return Image.network(
-                  url,
-                  height: 80,
-                  fit: BoxFit.cover,
-                );
-              });
+          String url = snapshot.data!.docs[0]['downloadURL'];
+          return CircleAvatar(
+            radius: 100 / 2,
+            backgroundColor: Colors.grey.shade800,
+            backgroundImage: NetworkImage(url),
+          );
         }
       },
     );
@@ -113,7 +126,7 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
       floatingActionButton: buildRentalButton(),
       body: Center(
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -125,30 +138,52 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
                   fit: BoxFit.contain,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               Text(
                 "Good Day, ${loggedInUser.fullName}",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 25,
               ),
-              SizedBox(
-                  height: 80, child: Image.asset("assets/square-image.png")),
-              SizedBox(
+              // StreamBuilder<QuerySnapshot>(
+              //   stream: usersSelfie,
+              //   builder: (
+              //     BuildContext context,
+              //     AsyncSnapshot<QuerySnapshot> snapshot,
+              //   ) {
+              //     if (snapshot.hasError) {
+              //       return Text("Something went wrong!");
+              //     }
+              //     if (snapshot.connectionState == ConnectionState.waiting) {
+              //       return Text("Loading");
+              //     }
+              //     final data = snapshot.requireData;
+              //     return ListView.builder(
+              //       itemCount: data.size,
+              //       itemBuilder: (context, index) {
+              //         String url = data.docs[index]['downloadURL'];
+              //         return Text(url);
+              //       },
+              //     );
+              //   },
+              // ),
+              userImage,
+              const SizedBox(
                 height: 15,
               ),
-              SizedBox(
+              const SizedBox(
                 height: 15,
               ),
               borrowedItemsBtn,
-              SizedBox(
+              const SizedBox(
                 height: 15,
               ),
               lendedItemsBtn,
-              SizedBox(
+              const SizedBox(
                 height: 15,
               ),
             ],
@@ -159,12 +194,14 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
   }
 
   Widget buildRentalButton() => FloatingActionButton.extended(
-        label: Text("Add Rental"),
+        label: const Text("Rental"),
         onPressed: () {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => AddRent()));
+              context,
+              MaterialPageRoute(
+                  builder: (context) => LendedItems(userId: loggedInUser.uid)));
         },
-        icon: Icon(Icons.construction_rounded),
+        icon: const Icon(Icons.construction_rounded),
         backgroundColor: HexColor("#E4B43D"),
       );
 
@@ -186,7 +223,7 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
               onPressed: () {
                 logout(context);
               },
-              icon: Icon(Icons.logout),
+              icon: const Icon(Icons.logout),
             )
           ],
         ),

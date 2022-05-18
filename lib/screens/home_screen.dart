@@ -7,6 +7,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/imageupload/registration_upload_validid.dart';
 import 'package:rentool/model/user_model.dart';
 import 'package:rentool/screens/home_screen_default.dart';
+import 'package:rentool/screens/lend_items_screen.dart';
 import 'login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -43,42 +44,52 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: (index) {
             print("Clicked Tab $index");
           },
-          items: [
+          items: const [
             BottomNavigationBarItem(
               label: 'Home',
-              icon: Icon(CupertinoIcons.home),
+              icon: Icon(
+                CupertinoIcons.house_fill,
+                size: 25,
+              ),
             ),
             BottomNavigationBarItem(
               label: 'Chat',
-              icon: Icon(CupertinoIcons.conversation_bubble),
+              icon: Icon(
+                CupertinoIcons.chat_bubble_text_fill,
+                size: 25,
+              ),
             ),
             BottomNavigationBarItem(
               label: 'Notification',
-              icon: Icon(CupertinoIcons.bell_circle),
+              icon: Icon(
+                CupertinoIcons.bell_solid,
+                size: 25,
+              ),
             ),
             BottomNavigationBarItem(
               label: 'Profile',
-              icon: Icon(CupertinoIcons.person),
+              icon: Icon(
+                CupertinoIcons.person_circle_fill,
+                size: 25,
+              ),
             ),
           ],
         ),
         tabBuilder: (context, index) {
           switch (index) {
+            case 0:
+              return const LendItemsScreen();
             case 1:
-              return SizedBox(
-                child: Text("Page 2"),
-              );
-            case 2:
-              return SizedBox(
+              return const SizedBox(
                 child: Text("Page 3"),
               );
-            case 3:
-              return SizedBox(
+            case 2:
+              return const SizedBox(
                 child: Text("Page 4"),
               );
-            case 0:
+            case 3:
             default:
-              return HomeScreenDefault();
+              return const HomeScreenDefault();
           }
         },
       );
@@ -201,35 +212,35 @@ class _HomeScreenState extends State<HomeScreen> {
   //   );
   // }
 
-  Future<void> logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-    Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => LoginScreen()));
-  }
+  // Future<void> logout(BuildContext context) async {
+  //   await FirebaseAuth.instance.signOut();
+  //   Navigator.of(context).pushReplacement(
+  //       MaterialPageRoute(builder: (context) => LoginScreen()));
+  // }
 
-  _appBar() {
-    // getting the height of our appbar
-    final appBarHeight = AppBar().preferredSize.height;
-    return PreferredSize(
-        child: AppBar(
-          title: const Text("Profile"),
-          actions: [
-            IconButton(
-              onPressed: () {
-                logout(context);
-              },
-              icon: Icon(Icons.logout),
-            )
-          ],
-        ),
-        preferredSize: Size.fromHeight(appBarHeight));
-  }
+  // _appBar() {
+  //   // getting the height of our appbar
+  //   final appBarHeight = AppBar().preferredSize.height;
+  //   return PreferredSize(
+  //       child: AppBar(
+  //         title: const Text("Profile"),
+  //         actions: [
+  //           IconButton(
+  //             onPressed: () {
+  //               logout(context);
+  //             },
+  //             icon: Icon(Icons.logout),
+  //           )
+  //         ],
+  //       ),
+  //       preferredSize: Size.fromHeight(appBarHeight));
+  // }
 }
 
 // taking the URL and returning dynamic image type
-class FireStorageService extends ChangeNotifier {
-  FireStorageService();
-  static Future<dynamic> loadImage(BuildContext context, String Image) async {
-    return await FirebaseStorage.instance.ref().child(Image).getDownloadURL();
-  }
-}
+// class FireStorageService extends ChangeNotifier {
+//   FireStorageService();
+//   static Future<dynamic> loadImage(BuildContext context, String Image) async {
+//     return await FirebaseStorage.instance.ref().child(Image).getDownloadURL();
+//   }
+// }

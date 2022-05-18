@@ -49,10 +49,10 @@ class _LoginScreenState extends State<LoginScreen> {
         decoration: InputDecoration(
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
-                color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
+                color: buildMaterialColor(const Color(0xFFC35E12)), width: 2.0),
           ),
-          prefixIcon: Icon(Icons.email),
-          contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+          prefixIcon: const Icon(Icons.email),
+          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           hintText: "Email",
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(6),
@@ -96,12 +96,12 @@ class _LoginScreenState extends State<LoginScreen> {
         borderRadius: BorderRadius.circular(6),
         color: HexColor("#C35E12"),
         child: MaterialButton(
-          padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+          padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: MediaQuery.of(context).size.width,
           onPressed: () {
             signInFunction(emailController.text, passwordController.text);
           },
-          child: Text(
+          child: const Text(
             "Sign In",
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -130,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             fit: BoxFit.contain,
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 45,
                         ),
                         SizedBox(
@@ -140,32 +140,32 @@ class _LoginScreenState extends State<LoginScreen> {
                             fit: BoxFit.contain,
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 30,
                         ),
                         emailField,
-                        SizedBox(
+                        const SizedBox(
                           height: 15,
                         ),
                         passwordField,
-                        SizedBox(
+                        const SizedBox(
                           height: 35,
                         ),
                         signInBtn,
-                        SizedBox(
+                        const SizedBox(
                           height: 25,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Text("Don't have an account? "),
+                            const Text("Don't have an account? "),
                             GestureDetector(
                               onTap: () {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            RegistrationScreen()));
+                                            const RegistrationScreen()));
                               },
                               child: Text(
                                 "Sign Up",
@@ -193,7 +193,7 @@ class _LoginScreenState extends State<LoginScreen> {
           .then((uid) => {
                 Fluttertoast.showToast(msg: "Login Successful"),
                 Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => HomeScreen()))
+                    MaterialPageRoute(builder: (context) => const HomeScreen()))
               })
           .catchError((e) {
         Fluttertoast.showToast(msg: e!.message);

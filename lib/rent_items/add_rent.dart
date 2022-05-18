@@ -9,6 +9,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rentool/buildmaterialcolor.dart';
 import 'package:rentool/model/rent_items_model.dart';
+import 'package:rentool/rent_items/rent_list.dart';
 import 'package:rentool/screens/home_screen_default.dart';
 
 class AddRent extends StatefulWidget {
@@ -46,7 +47,7 @@ class _AddRentState extends State<AddRent> {
           _image = File(pick.path);
         } else {
           // showing a snackbar error
-          showSnackBar("No file selected", Duration(milliseconds: 400));
+          showSnackBar("No file selected", const Duration(milliseconds: 400));
         }
       });
     } on PlatformException catch (e) {
@@ -72,8 +73,8 @@ class _AddRentState extends State<AddRent> {
         .collection("rent-items")
         .doc(id)
         .collection("images")
-        .add({'downloadURL': downloadURL}).whenComplete(() =>
-            showSnackBar("Image uploaded successfully", Duration(seconds: 2)));
+        .add({'downloadURL': downloadURL}).whenComplete(() => showSnackBar(
+            "Image uploaded successfully", const Duration(seconds: 2)));
   }
 
   // snackbar for showing errors
@@ -108,7 +109,7 @@ class _AddRentState extends State<AddRent> {
               borderSide: BorderSide(
                   color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
             ),
-            contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+            contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
             ),
@@ -140,7 +141,7 @@ class _AddRentState extends State<AddRent> {
               borderSide: BorderSide(
                   color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
             ),
-            contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+            contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
             ),
@@ -170,7 +171,7 @@ class _AddRentState extends State<AddRent> {
               borderSide: BorderSide(
                   color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
             ),
-            contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+            contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
             ),
@@ -200,7 +201,7 @@ class _AddRentState extends State<AddRent> {
               borderSide: BorderSide(
                   color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
             ),
-            contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+            contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
             ),
@@ -216,7 +217,7 @@ class _AddRentState extends State<AddRent> {
           onPressed: () {
             imagePickerMethod(ImageSource.gallery);
           },
-          child: Text(
+          child: const Text(
             "Choose from album",
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -235,7 +236,7 @@ class _AddRentState extends State<AddRent> {
           onPressed: () {
             imagePickerMethod(ImageSource.camera);
           },
-          child: Text(
+          child: const Text(
             "Take a picture",
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -254,7 +255,7 @@ class _AddRentState extends State<AddRent> {
           onPressed: () {
             postDetailsToFirestore();
           },
-          child: Text(
+          child: const Text(
             "Place Item",
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -296,53 +297,53 @@ class _AddRentState extends State<AddRent> {
                             fit: BoxFit.contain,
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
-                        Text("Add Item",
+                        const Text("Add Item",
                             style: TextStyle(
                                 fontWeight: FontWeight.w500, fontSize: 20)),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         itemNameField,
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         itemDescriptionField,
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         itemPriceField,
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         itemQuantityField,
-                        SizedBox(
+                        const SizedBox(
                           height: 25,
                         ),
                         SizedBox(
                           height: 160,
                           child: _image == null
-                              ? Image.asset("assets/square-image.png")
+                              ? Image.asset("assets/square-album.png")
                               : Image.file(_image!),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         galleryBtn,
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         cameraBtn,
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         placeItemBtn,
-                        SizedBox(
+                        const SizedBox(
                           height: 25,
                         ),
                       ],
@@ -364,7 +365,7 @@ class _AddRentState extends State<AddRent> {
     RentItemModel rentItemModel = RentItemModel();
     // writing all the values
     rentItemModel.uid = user!.uid;
-    rentItemModel.itemName = itemNameEditingController.text;
+    rentItemModel.itemName = itemNameEditingController.text.toUpperCase();
     rentItemModel.itemDescription = itemDescriptionEditingController.text;
     rentItemModel.itemPrice = itemPriceEditingController.text;
     rentItemModel.itemQuantity = itemQuantityEditingController.text;
@@ -375,8 +376,8 @@ class _AddRentState extends State<AddRent> {
         .then((value) {
       uploadImage(value.id);
     });
-    Fluttertoast.showToast(msg: "For rent item created successfully");
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => HomeScreenDefault()));
+    Fluttertoast.showToast(msg: "Rent item created successfully");
+    Navigator.pop(
+        context, MaterialPageRoute(builder: (context) => LendedItems()));
   }
 }
