@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/rent_items/item_details.dart';
-import 'package:rentool/rent_items/rent_details.dart';
 
 import '../buildmaterialcolor.dart';
 
@@ -17,6 +16,8 @@ class _LendItemsScreenState extends State<LendItemsScreen> {
   final _formKey = GlobalKey<FormState>();
   final searchItemEditingController = new TextEditingController();
 
+  String? searchString;
+
   // Future<void> searchList =
 
   @override
@@ -25,18 +26,21 @@ class _LendItemsScreenState extends State<LendItemsScreen> {
         autofocus: false,
         controller: searchItemEditingController,
         keyboardType: TextInputType.name,
-        validator: (value) {
-          RegExp regex = new RegExp(r'^.{6,}$');
-          if (value!.isEmpty) {
-            return ("Fullname cannot be empty");
-          }
-          if (!regex.hasMatch(value)) {
-            return ("Please enter valid name(Min. 6 Character)");
-          }
-          return null;
-        },
-        onSaved: (value) {
-          searchItemEditingController.text = value!;
+        // validator: (value) {
+        //   RegExp regex = new RegExp(r'^.{6,}$');
+        //   if (value!.isEmpty) {
+        //     return ("Fullname cannot be empty");
+        //   }
+        //   if (!regex.hasMatch(value)) {
+        //     return ("Please enter valid name(Min. 6 Character)");
+        //   }
+        //   return null;
+        // },
+        onChanged: (val) {
+          setState(() {
+            searchString = val.toUpperCase();
+            print(searchString);
+          });
         },
         textInputAction: TextInputAction.done,
         decoration: InputDecoration(
@@ -99,10 +103,15 @@ class _LendItemsScreenState extends State<LendItemsScreen> {
             )),
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection("rent-items")
-            .orderBy("dateCreated", descending: true)
-            .snapshots(),
+        stream: (searchString == null || searchString == '')
+            ? FirebaseFirestore.instance
+                .collection("rent-items")
+                .orderBy("dateCreated", descending: true)
+                .snapshots()
+            : FirebaseFirestore.instance
+                .collection("rent-items")
+                .where("itemName", isGreaterThan: searchString)
+                .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
             return const Text("something wrong");

@@ -45,8 +45,8 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
         .doc(user!.uid)
         .get()
         .then((value) {
-      this.loggedInUser = UserModel.fromMap(value.data());
-      // setState(() {});
+      loggedInUser = UserModel.fromMap(value.data());
+      setState(() {});
     });
   }
 
@@ -122,6 +122,7 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
     );
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: _appBar(),
       floatingActionButton: buildRentalButton(),
       body: Center(

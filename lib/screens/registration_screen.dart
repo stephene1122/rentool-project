@@ -439,7 +439,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     User? user = _auth.currentUser;
-
     UserModel userModel = UserModel();
     // writing all the values
     userModel.emailAddress = user!.email;

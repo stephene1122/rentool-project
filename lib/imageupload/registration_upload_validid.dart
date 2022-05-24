@@ -37,7 +37,7 @@ class _UploadValidIdState extends State<UploadValidId> {
           _image = File(pick.path);
         } else {
           // showing a snackbar error
-          showSnackBar("No file selected", Duration(milliseconds: 400));
+          showSnackBar("No file selected", const Duration(milliseconds: 400));
         }
       });
     } on PlatformException catch (e) {
@@ -84,12 +84,12 @@ class _UploadValidIdState extends State<UploadValidId> {
         borderRadius: BorderRadius.circular(30),
         color: HexColor("#C35E12"),
         child: MaterialButton(
-          padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+          padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: 265,
           onPressed: () {
             imagePickerMethod(ImageSource.gallery);
           },
-          child: Text(
+          child: const Text(
             "Choose from album",
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -103,12 +103,12 @@ class _UploadValidIdState extends State<UploadValidId> {
         borderRadius: BorderRadius.circular(30),
         color: HexColor("#C35E12"),
         child: MaterialButton(
-          padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+          padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: 265,
           onPressed: () {
             imagePickerMethod(ImageSource.camera);
           },
-          child: Text(
+          child: const Text(
             "Take a picture",
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -122,7 +122,7 @@ class _UploadValidIdState extends State<UploadValidId> {
         borderRadius: BorderRadius.circular(6),
         color: HexColor("#C35E12"),
         child: MaterialButton(
-          padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+          padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: 265,
           onPressed: () {
             // upload only when the image has some values
@@ -135,10 +135,11 @@ class _UploadValidIdState extends State<UploadValidId> {
                                 UploadUserImage(userId: widget.userId)))
                   });
             } else {
-              showSnackBar("Select Image First", Duration(milliseconds: 400));
+              showSnackBar(
+                  "Select Image First", const Duration(milliseconds: 400));
             }
           },
-          child: Text(
+          child: const Text(
             "Next",
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -149,7 +150,7 @@ class _UploadValidIdState extends State<UploadValidId> {
       appBar: AppBar(title: const Text("Image Upload")),
       body: Center(
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -161,14 +162,14 @@ class _UploadValidIdState extends State<UploadValidId> {
                   fit: BoxFit.contain,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
-              Text(
+              const Text(
                 "Please upload your valid ID",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 25,
               ),
               Expanded(
@@ -177,22 +178,22 @@ class _UploadValidIdState extends State<UploadValidId> {
                         height: 140, child: Image.asset("assets/id-image.png"))
                     : Image.file(_image!),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 15,
               ),
-              SizedBox(
+              const SizedBox(
                 height: 15,
               ),
               galleryBtn,
-              SizedBox(
+              const SizedBox(
                 height: 15,
               ),
               cameraBtn,
-              SizedBox(
+              const SizedBox(
                 height: 35,
               ),
               nextBtn,
-              SizedBox(
+              const SizedBox(
                 height: 15,
               ),
             ],

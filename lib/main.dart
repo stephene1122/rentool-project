@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:rentool/rent_items/item_details.dart';
 import 'package:rentool/screens/login_screen.dart';
 import 'buildmaterialcolor.dart';
 
@@ -30,6 +31,6 @@ class MyApp extends StatelessWidget {
           // is not restarted.
           primarySwatch: buildMaterialColor(Color(0xFFC35E12)),
         ),
-        home: const LoginScreen());
+        home: LoginScreen());
   }
 }

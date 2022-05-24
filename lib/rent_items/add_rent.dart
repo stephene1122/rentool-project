@@ -9,6 +9,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rentool/buildmaterialcolor.dart';
 import 'package:rentool/model/rent_items_model.dart';
+import 'package:rentool/rent_items/rent_item_note.dart';
 import 'package:rentool/rent_items/rent_list.dart';
 import 'package:rentool/screens/home_screen_default.dart';
 
@@ -74,7 +75,7 @@ class _AddRentState extends State<AddRent> {
         .doc(id)
         .collection("images")
         .add({'downloadURL': downloadURL}).whenComplete(() => showSnackBar(
-            "Image uploaded successfully", const Duration(seconds: 2)));
+            "Item created successfully", const Duration(seconds: 0)));
   }
 
   // snackbar for showing errors
@@ -139,7 +140,8 @@ class _AddRentState extends State<AddRent> {
         decoration: InputDecoration(
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(
-                  color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
+                  color: buildMaterialColor(const Color(0xFFC35E12)),
+                  width: 2.0),
             ),
             contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             border: OutlineInputBorder(
@@ -169,7 +171,8 @@ class _AddRentState extends State<AddRent> {
         decoration: InputDecoration(
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(
-                  color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
+                  color: buildMaterialColor(const Color(0xFFC35E12)),
+                  width: 2.0),
             ),
             contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             border: OutlineInputBorder(
@@ -199,7 +202,8 @@ class _AddRentState extends State<AddRent> {
         decoration: InputDecoration(
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(
-                  color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
+                  color: buildMaterialColor(const Color(0xFFC35E12)),
+                  width: 2.0),
             ),
             contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             border: OutlineInputBorder(
@@ -212,7 +216,7 @@ class _AddRentState extends State<AddRent> {
         borderRadius: BorderRadius.circular(30),
         color: HexColor("#C35E12"),
         child: MaterialButton(
-          padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+          padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: 265,
           onPressed: () {
             imagePickerMethod(ImageSource.gallery);
@@ -231,7 +235,7 @@ class _AddRentState extends State<AddRent> {
         borderRadius: BorderRadius.circular(30),
         color: HexColor("#C35E12"),
         child: MaterialButton(
-          padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+          padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: 265,
           onPressed: () {
             imagePickerMethod(ImageSource.camera);
@@ -250,7 +254,7 @@ class _AddRentState extends State<AddRent> {
         borderRadius: BorderRadius.circular(6),
         color: HexColor("#C35E12"),
         child: MaterialButton(
-          padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+          padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: 265,
           onPressed: () {
             postDetailsToFirestore();
@@ -376,8 +380,8 @@ class _AddRentState extends State<AddRent> {
         .then((value) {
       uploadImage(value.id);
     });
-    Fluttertoast.showToast(msg: "Rent item created successfully");
-    Navigator.pop(
-        context, MaterialPageRoute(builder: (context) => LendedItems()));
+    // Fluttertoast.showToast(msg: "For rent item created successfully");
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => RentItemThankYouScreen()));
   }
 }
