@@ -67,7 +67,7 @@ class _UploadUserImageState extends State<UploadUserImage> {
       'downloadURL': downloadURL,
       'dateCreated': DateTime.now()
     }).whenComplete(() =>
-            showSnackBar("Image uploaded successfully", Duration(seconds: 2)));
+            showSnackBar("Image uploaded successfully", Duration(seconds: 0)));
   }
 
   // snackbar for showing errors

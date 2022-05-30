@@ -12,7 +12,11 @@ import '../buildmaterialcolor.dart';
 
 class PlaceRentDetails extends StatefulWidget {
   PlaceRentDetails(
-      {Key? key, this.refId, this.rentItemsRefId, this.rentItemQuantity})
+      {Key? key,
+      this.refId,
+      this.rentItemsRefId,
+      this.rentItemQuantity,
+      this.lenderUid})
       : super(key: key);
 
   // QueryDocumentSnapshot refId;
@@ -20,6 +24,7 @@ class PlaceRentDetails extends StatefulWidget {
   String? refId;
   String? rentItemsRefId;
   num? rentItemQuantity;
+  String? lenderUid;
 
   @override
   State<PlaceRentDetails> createState() => _PlaceRentDetailsState();
@@ -27,6 +32,7 @@ class PlaceRentDetails extends StatefulWidget {
 
 class _PlaceRentDetailsState extends State<PlaceRentDetails> {
   LendItemModel lendedItemDetails = LendItemModel();
+  UserModel lenderDetails = UserModel();
 
   final FirebaseAuth auth = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();
@@ -46,7 +52,16 @@ class _PlaceRentDetailsState extends State<PlaceRentDetails> {
         .get()
         .then((d1) {
       lendedItemDetails = LendItemModel.fromMap(d1.data());
-      setState(() {});
+      setState(() {
+        FirebaseFirestore.instance
+            .collection("users")
+            .doc(widget.lenderUid)
+            .get()
+            .then((d2) {
+          lenderDetails = UserModel.fromMap(d2.data());
+          setState(() {});
+        });
+      });
     });
     lendItemPaymentMethodController.text = "COD / Cash on delivery";
   }
@@ -293,7 +308,10 @@ class _PlaceRentDetailsState extends State<PlaceRentDetails> {
                                           20, 5, 20, 5),
                                       minWidth: 350,
                                       onPressed: () {
-                                        postLendedItem();
+                                        postLendedItem(
+                                            lenderDetails.uid,
+                                            lenderDetails.emailAddress,
+                                            lenderDetails.fullName);
                                       },
                                       child: const Text(
                                         "Place Order",
@@ -320,7 +338,7 @@ class _PlaceRentDetailsState extends State<PlaceRentDetails> {
     );
   }
 
-  void postLendedItem() async {
+  void postLendedItem(String? uid, String? email, String? name) async {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
     LendItemModel lendedModel = LendItemModel();
@@ -340,6 +358,12 @@ class _PlaceRentDetailsState extends State<PlaceRentDetails> {
     });
     Fluttertoast.showToast(msg: "created");
     Navigator.push(
-        (context), MaterialPageRoute(builder: (context) => ContactLender()));
+        (context),
+        MaterialPageRoute(
+            builder: (context) => ContactLender(
+                  lenderUid: uid,
+                  lenderEmail: email,
+                  lenderName: name,
+                )));
   }
 }

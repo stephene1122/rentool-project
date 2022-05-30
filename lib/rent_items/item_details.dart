@@ -87,22 +87,19 @@ class _ItemDetailsState extends State<ItemDetails> {
       body: Container(
         child: Center(
           child: SingleChildScrollView(
-            reverse: true,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                  maxHeight: screenHeightMinusAppBarMinusStatusBar),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10, bottom: 10),
-                    child: SizedBox(
-                        height: 85,
-                        child: Image.asset(
-                          "assets/logo.png",
-                          fit: BoxFit.contain,
-                        )),
-                  ),
-                  Expanded(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 10),
+                  child: SizedBox(
+                      height: 85,
+                      child: Image.asset(
+                        "assets/logo.png",
+                        fit: BoxFit.contain,
+                      )),
+                ),
+                SingleChildScrollView(
+                  child: Expanded(
                     child: Padding(
                       padding: const EdgeInsets.all(10),
                       child: Container(
@@ -345,8 +342,8 @@ class _ItemDetailsState extends State<ItemDetails> {
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -401,9 +398,11 @@ class _ItemDetailsState extends State<ItemDetails> {
             (context),
             MaterialPageRoute(
                 builder: (context) => PlaceRentDetails(
-                    refId: value.id,
-                    rentItemsRefId: widget.refId,
-                    rentItemQuantity: g)));
+                      refId: value.id,
+                      rentItemsRefId: widget.refId,
+                      rentItemQuantity: g,
+                      lenderUid: lenderUser.uid,
+                    )));
       });
 
       Fluttertoast.showToast(msg: "created");

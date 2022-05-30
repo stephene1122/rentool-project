@@ -4,6 +4,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:rentool/chat/people.dart';
+import 'package:rentool/chat/recent_chat_people.dart';
 import 'package:rentool/imageupload/registration_upload_validid.dart';
 import 'package:rentool/model/user_model.dart';
 import 'package:rentool/screens/home_screen_default.dart';
@@ -11,7 +13,9 @@ import 'package:rentool/screens/lend_items_screen.dart';
 import 'login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  HomeScreen({Key? key, this.tabIndex}) : super(key: key);
+
+  int? tabIndex;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -41,8 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: HexColor("#E4B43D"),
           activeColor: HexColor("#C35E12"),
           inactiveColor: Colors.white,
-          onTap: (index) {
-            print("Clicked Tab $index");
+          onTap: (tabIndex) {
+            print("Clicked Tab $tabIndex");
           },
           items: const [
             BottomNavigationBarItem(
@@ -75,14 +79,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-        tabBuilder: (context, index) {
-          switch (index) {
+        tabBuilder: (context, tabIndex) {
+          switch (tabIndex) {
             case 0:
               return const LendItemsScreen();
             case 1:
-              return const SizedBox(
-                child: Text("Page 3"),
-              );
+              return RecentChatPeople();
             case 2:
               return const SizedBox(
                 child: Text("Page 4"),

@@ -104,25 +104,21 @@ class _LendedItemsState extends State<LendedItems> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(3),
                                 side: BorderSide(color: HexColor("#C35E12"))),
-                            title: Flexible(
-                              child: Text(
-                                "${snapshot.data!.docChanges[index].doc['itemName']}",
-                                style: const TextStyle(fontSize: 20),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                            title: Text(
+                              "${snapshot.data!.docChanges[index].doc['itemName']}",
+                              style: const TextStyle(fontSize: 20),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             leading: _imageItem(
                               refId: snapshot
                                   .data!.docChanges[index].doc.reference.id,
                             ),
-                            subtitle: Flexible(
-                              child: Text(
-                                "${snapshot.data!.docChanges[index].doc['itemDescription']}",
-                                style: const TextStyle(fontSize: 16),
-                                maxLines: 4,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                            subtitle: Text(
+                              "${snapshot.data!.docChanges[index].doc['itemDescription']}",
+                              style: const TextStyle(fontSize: 16),
+                              maxLines: 4,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             contentPadding: const EdgeInsets.symmetric(
                                 vertical: 12, horizontal: 16),

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/rent_items/item_details.dart';
@@ -18,7 +19,7 @@ class _LendItemsScreenState extends State<LendItemsScreen> {
 
   String? searchString;
 
-  // Future<void> searchList =
+  final _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -106,11 +107,12 @@ class _LendItemsScreenState extends State<LendItemsScreen> {
         stream: (searchString == null || searchString == '')
             ? FirebaseFirestore.instance
                 .collection("rent-items")
-                .orderBy("dateCreated", descending: true)
+                .where("uid", isNotEqualTo: _auth.currentUser!.uid)
                 .snapshots()
             : FirebaseFirestore.instance
                 .collection("rent-items")
                 .where("itemName", isGreaterThan: searchString)
+                .where("uid", isNotEqualTo: _auth.currentUser!.uid)
                 .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
@@ -156,25 +158,21 @@ class _LendItemsScreenState extends State<LendItemsScreen> {
                                     borderRadius: BorderRadius.circular(3),
                                     side:
                                         BorderSide(color: HexColor("#C35E12"))),
-                                title: Flexible(
-                                  child: Text(
-                                    "${snapshot.data!.docChanges[index].doc['itemName']}",
-                                    style: const TextStyle(fontSize: 20),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                                title: Text(
+                                  "${snapshot.data!.docChanges[index].doc['itemName']}",
+                                  style: const TextStyle(fontSize: 20),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                                 leading: _imageItem(
                                   refId: snapshot
                                       .data!.docChanges[index].doc.reference.id,
                                 ),
-                                subtitle: Flexible(
-                                  child: Text(
-                                    "${snapshot.data!.docChanges[index].doc['itemDescription']}",
-                                    style: const TextStyle(fontSize: 16),
-                                    maxLines: 4,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                                subtitle: Text(
+                                  "${snapshot.data!.docChanges[index].doc['itemDescription']}",
+                                  style: const TextStyle(fontSize: 16),
+                                  maxLines: 4,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
                                     vertical: 12, horizontal: 16),
@@ -222,20 +220,6 @@ class _imageItem extends StatelessWidget {
               width: 80,
               child: Image.asset("assets/square-album.png"));
         } else {
-          // return ListView.builder(
-          //     itemCount: snapshot.data!.docs.length,
-          //     itemBuilder: (BuildContext context, int index) {
-          //       String url = snapshot.data!.docs[index]["downloadURL"];
-          //       return GestureDetector(
-          //         onTap: () {
-          //           print("images");
-          //         },
-          //         child: CircleAvatar(
-          //           radius: 30,
-          //           backgroundImage: NetworkImage(url),
-          //         ),
-          //       );
-          //     });
           String url = snapshot.data!.docs[0]["downloadURL"];
           return GestureDetector(
               onTap: () {

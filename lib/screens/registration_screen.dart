@@ -204,7 +204,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             return ("Contact number cannot be empty");
           }
           if (!regex.hasMatch(value)) {
-            return ("Please enter valid gender(Exp. Male or Female)");
+            return ("Please enter valid Contact#(Min. value is 11)");
           }
           return null;
         },

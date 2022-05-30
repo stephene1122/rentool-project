@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:rentool/chat/chatpage.dart';
 import 'package:rentool/screens/home_screen.dart';
 import 'package:rentool/screens/lend_items_screen.dart';
 
 class ContactLender extends StatefulWidget {
-  const ContactLender({Key? key}) : super(key: key);
-
+  ContactLender({Key? key, this.lenderUid, this.lenderEmail, this.lenderName})
+      : super(key: key);
+  String? lenderUid;
+  String? lenderEmail;
+  String? lenderName;
   @override
   State<ContactLender> createState() => _ContactLenderState();
 }
@@ -45,7 +49,11 @@ class _ContactLenderState extends State<ContactLender> {
                       Navigator.push(
                           (context),
                           MaterialPageRoute(
-                              builder: (context) => const HomeScreen()));
+                              builder: (context) => chatpage(
+                                    friendUid: widget.lenderUid,
+                                    friendEmail: widget.lenderEmail,
+                                    friendName: widget.lenderName,
+                                  )));
                     },
                     child: const Text(
                       "Contact Lender",
