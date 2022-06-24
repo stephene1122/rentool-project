@@ -27,11 +27,13 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  cached_network_image: ^3.2.1
   cloud_firestore: ^3.1.13
   cupertino_icons: ^1.0.2
   dropdown_button2: ^1.4.0
   firebase_auth: ^3.3.15
   firebase_core: ^1.15.0
+  firebase_messaging: ^11.4.1
   firebase_storage: ^10.2.13
   flutter:
     sdk: flutter
@@ -45,12 +47,10 @@ dev_dependencies:
     sdk: flutter
 
 #   flutter_launcher_icons: "^0.0.1"
-
 # flutter_icons:
 # image_path: "assets/logo_foreground.png"
 # android: true
 # ios: true
-
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter.

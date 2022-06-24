@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:rentool/rent_items/add_rent.dart';
+import 'package:rentool/borrow_items/borrow_item_list.dart';
 import 'package:rentool/rent_items/rent_list.dart';
-
-import '../imageupload/registration_upload_validid.dart';
 import '../model/user_model.dart';
 import 'login_screen.dart';
 
@@ -48,6 +47,11 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
       loggedInUser = UserModel.fromMap(value.data());
       setState(() {});
     });
+
+    // Notification
+    FirebaseMessaging.onMessage.listen((event) {
+      print("FCM message recieved");
+    });
   }
 
   @override
@@ -61,11 +65,11 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
           padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: 265,
           onPressed: () {
-            // Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //         builder: (context) =>
-            //             UploadValidId(userId: loggedInUser.uid)));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        BorrowItemsList(userId: loggedInUser.uid)));
           },
           child: const Text(
             "Borrowed Items",
@@ -110,7 +114,13 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
         if (!snapshot.hasData) {
           return SizedBox(
               height: 80, child: Image.asset("assets/square-image.png"));
-        } else {
+        }
+        // if (snapshot.connectionState == ConnectionState.waiting) {
+        //   return const Center(
+        //     child: CircularProgressIndicator(),
+        //   );
+        // }
+        else {
           String url = snapshot.data!.docs[0]['downloadURL'];
           return CircleAvatar(
             radius: 100 / 2,

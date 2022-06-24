@@ -1,12 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:rentool/rent_items/item_details.dart';
 import 'package:rentool/screens/login_screen.dart';
 import 'buildmaterialcolor.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  FirebaseMessaging.onBackgroundMessage(_handleBackgroundMessaging);
 
   runApp(const MyApp());
 }
@@ -31,6 +33,10 @@ class MyApp extends StatelessWidget {
           // is not restarted.
           primarySwatch: buildMaterialColor(Color(0xFFC35E12)),
         ),
-        home: LoginScreen());
+        home: const LoginScreen());
   }
+}
+
+Future<void> _handleBackgroundMessaging(RemoteMessage message) async {
+  // notification click listener
 }

@@ -112,6 +112,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               borderSide: BorderSide(
                   color: buildMaterialColor(Color(0xFFC35E12)), width: 2.0),
             ),
+            hintText: "Month-Day-Year",
             prefixIcon: const Icon(Icons.calendar_month),
             contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             border: OutlineInputBorder(
@@ -136,8 +137,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       //   Icons.arrow_drop_down,
       //   color: Colors.black45,
       // ),
-      iconSize: 20,
-      buttonPadding: const EdgeInsets.only(left: 20, right: 10),
+      icon: const Icon(Icons.arrow_drop_down),
+      iconSize: 25,
+      dropdownPadding: const EdgeInsets.only(left: 20, right: 1),
       dropdownDecoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
       ),

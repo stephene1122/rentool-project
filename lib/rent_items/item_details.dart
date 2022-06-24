@@ -68,6 +68,8 @@ class _ItemDetailsState extends State<ItemDetails> {
             AppBar().preferredSize.height -
             MediaQuery.of(context).padding.top;
 
+    num item_quantity = 10;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -249,12 +251,16 @@ class _ItemDetailsState extends State<ItemDetails> {
                                         textInputAction: TextInputAction.next,
                                         textAlign: TextAlign.center,
                                         validator: (value) {
-                                          if (value!.isEmpty ||
+                                          int valueQuantity = int.parse(value!);
+                                          if (value.isEmpty ||
                                               value.length < 1) {
                                             return 'Quantity cannot be empty';
                                           }
                                           if (value == 0 || value == "0") {
                                             return "Quantity cannot be zero";
+                                          }
+                                          if (valueQuantity > item_quantity) {
+                                            return "Input must less than item quantity";
                                           }
                                         },
                                         decoration: InputDecoration(

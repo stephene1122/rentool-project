@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:rentool/rent_items/rent_list.dart';
 import 'package:rentool/screens/home_screen.dart';
 
 class RentItemThankYouScreen extends StatefulWidget {
@@ -65,13 +66,10 @@ class _RentItemThankYouScreenState extends State<RentItemThankYouScreen> {
                     padding: const EdgeInsets.fromLTRB(20, 5, 20, 5),
                     minWidth: 350,
                     onPressed: () {
-                      Navigator.push(
-                              (context),
-                              MaterialPageRoute(
-                                  builder: (context) => HomeScreen()))
-                          .then((value) {
-                        setState(() {});
-                      });
+                      Navigator.pushReplacement(
+                          context,
+                          new MaterialPageRoute(
+                              builder: (context) => new LendedItems()));
                     },
                     child: const Text(
                       "Check your Item",

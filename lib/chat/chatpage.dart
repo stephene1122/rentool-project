@@ -1,7 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:rentool/model/chatted_friend_model.dart';
 import 'package:rentool/screens/login_screen.dart';
+import 'package:rentool/services/chatted_friend.dart';
+import '../model/user_model.dart';
 import 'message.dart';
 
 class chatpage extends StatefulWidget {
@@ -20,17 +24,33 @@ class chatpage extends StatefulWidget {
 class _chatpageState extends State<chatpage> {
   _chatpageState();
 
+  ChattedFriendModel getChattedUser = ChattedFriendModel();
+  UserModel getUser = UserModel();
+
   CollectionReference chats = FirebaseFirestore.instance.collection("chats");
 
   final fs = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
   final TextEditingController message = new TextEditingController();
+
   var chatDocId;
+  var chatFriendId;
+  var isChattedFriend;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(widget.friendUid)
+        .get()
+        .then((value) {
+      getUser = UserModel.fromMap(value.data());
+      setState(() {});
+    });
+
     chats
         .where("users",
             isEqualTo: {widget.friendUid: null, _auth.currentUser!.uid: null})
@@ -46,11 +66,41 @@ class _chatpageState extends State<chatpage> {
           }
         })
         .catchError((error) {});
-    setState(() {});
+
+    ChattedFriendService()
+        .getFriendChat(_auth.currentUser!.uid, widget.friendUid!)
+        .then((QuerySnapshot d) {
+      if (d.docs.isNotEmpty) {
+        isChattedFriend = true;
+      } else {
+        isChattedFriend = false;
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    // get selfie image url
+    final userImage = StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection("users")
+          .doc(_auth.currentUser!.uid)
+          .collection("chatted-friend")
+          .limit(1)
+          .snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) {
+          return Text("data");
+        } else {
+          String url = snapshot.data!.docs[0]['downloadURL'];
+          return CircleAvatar(
+            radius: 100 / 2,
+            backgroundColor: Colors.grey.shade800,
+            backgroundImage: NetworkImage(url),
+          );
+        }
+      },
+    );
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -94,6 +144,7 @@ class _chatpageState extends State<chatpage> {
               children: [
                 Expanded(
                   child: TextFormField(
+                    autofocus: true,
                     maxLines: null,
                     controller: message,
                     textInputAction: TextInputAction.newline,
@@ -130,8 +181,22 @@ class _chatpageState extends State<chatpage> {
                         'message': message.text.trim(),
                         'time': DateTime.now(),
                         'email': _auth.currentUser!.email,
+                        'isSeen': false
                       });
-
+                      // adding chat friend list
+                      if (isChattedFriend == false) {
+                        fs
+                            .collection("users")
+                            .doc(_auth.currentUser!.uid)
+                            .collection("chatted-friend")
+                            .add({
+                          "uid": widget.friendUid,
+                          "friend-chat-name": getUser.fullName,
+                          "friend-chat-contact": getUser.contactNumber,
+                          "friend-chat-email": getUser.emailAddress,
+                          "dateCreated": DateTime.now(),
+                        }).then((value) {});
+                      }
                       message.clear();
                     }
                   },

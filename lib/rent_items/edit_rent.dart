@@ -1,36 +1,35 @@
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rentool/buildmaterialcolor.dart';
 import 'package:rentool/model/rent_items_model.dart';
 import 'package:rentool/rent_items/rent_item_note.dart';
 import 'package:rentool/rent_items/rent_list.dart';
-import 'package:rentool/screens/home_screen_default.dart';
 
-class AddRent extends StatefulWidget {
-  const AddRent({Key? key}) : super(key: key);
+class EditRentItem extends StatefulWidget {
+  EditRentItem({Key? key, required this.docId}) : super(key: key);
+
+  QueryDocumentSnapshot docId;
 
   @override
-  State<AddRent> createState() => _AddRentState();
+  State<EditRentItem> createState() => _EditRentItemState();
 }
 
-class _AddRentState extends State<AddRent> {
-  final _auth = FirebaseAuth.instance;
-
-  // our form key
+class _EditRentItemState extends State<EditRentItem> {
   final _formKey = GlobalKey<FormState>();
 
-  // editing controller
-  final itemNameEditingController = new TextEditingController();
-  final itemDescriptionEditingController = new TextEditingController();
-  final itemPriceEditingController = new TextEditingController();
-  final itemQuantityEditingController = new TextEditingController();
+  final _auth = FirebaseAuth.instance;
+
+  TextEditingController itemNameController = TextEditingController();
+  TextEditingController itemDescriptionController = TextEditingController();
+  TextEditingController itemPriceController = TextEditingController();
+  TextEditingController itemQuantityController = TextEditingController();
 
   // some initialization
   File? _image;
@@ -56,10 +55,7 @@ class _AddRentState extends State<AddRent> {
     }
   }
 
-  // uploading the image, then getting the download url and then
-  // adding that download url to our cloudfirestore
-
-  Future uploadImage(String id) async {
+  Future uploadImage() async {
     final postID = DateTime.now().millisecondsSinceEpoch.toString();
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     Reference ref = FirebaseStorage.instance
@@ -72,13 +68,13 @@ class _AddRentState extends State<AddRent> {
     // uploading to cloudfirestore
     await firebaseFirestore
         .collection("rent-items")
-        .doc(id)
+        .doc(widget.docId.id)
         .collection("images")
         .add({
       'downloadURL': downloadURL,
-      'dateCreated': DateTime.now().millisecondsSinceEpoch,
+      'dateCreated': DateTime.now(),
     }).whenComplete(() => showSnackBar(
-            "Item created successfully", const Duration(seconds: 0)));
+            "Item created successfully", const Duration(seconds: 2)));
   }
 
   // snackbar for showing errors
@@ -88,11 +84,25 @@ class _AddRentState extends State<AddRent> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    itemNameController =
+        TextEditingController(text: widget.docId.get('itemName'));
+    itemDescriptionController =
+        TextEditingController(text: widget.docId.get('itemDescription'));
+    itemPriceController =
+        TextEditingController(text: widget.docId.get('itemPrice'));
+    itemQuantityController =
+        TextEditingController(text: widget.docId.get('itemQuantity'));
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // item name field
     final itemNameField = TextFormField(
         autofocus: false,
-        controller: itemNameEditingController,
+        controller: itemNameController,
         keyboardType: TextInputType.name,
         validator: (value) {
           RegExp regex = new RegExp(r'^.{6,}$');
@@ -105,7 +115,7 @@ class _AddRentState extends State<AddRent> {
           return null;
         },
         onSaved: (value) {
-          itemNameEditingController.text = value!;
+          itemNameController.text = value!;
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
@@ -122,7 +132,7 @@ class _AddRentState extends State<AddRent> {
     // item description field
     final itemDescriptionField = TextFormField(
         autofocus: false,
-        controller: itemDescriptionEditingController,
+        controller: itemDescriptionController,
         keyboardType: TextInputType.multiline,
         minLines: 1,
         maxLines: 5,
@@ -137,7 +147,7 @@ class _AddRentState extends State<AddRent> {
           return null;
         },
         onSaved: (value) {
-          itemDescriptionEditingController.text = value!;
+          itemDescriptionController.text = value!;
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
@@ -155,7 +165,7 @@ class _AddRentState extends State<AddRent> {
     // item Price field
     final itemPriceField = TextFormField(
         autofocus: false,
-        controller: itemPriceEditingController,
+        controller: itemPriceController,
         keyboardType: TextInputType.number,
         validator: (value) {
           RegExp regex = new RegExp(r'^.{6,}$');
@@ -168,7 +178,7 @@ class _AddRentState extends State<AddRent> {
           return null;
         },
         onSaved: (value) {
-          itemPriceEditingController.text = value!;
+          itemPriceController.text = value!;
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
@@ -186,7 +196,7 @@ class _AddRentState extends State<AddRent> {
     // item quantity field
     final itemQuantityField = TextFormField(
         autofocus: false,
-        controller: itemQuantityEditingController,
+        controller: itemQuantityController,
         keyboardType: TextInputType.number,
         validator: (value) {
           RegExp regex = new RegExp(r'^.{6,}$');
@@ -199,7 +209,7 @@ class _AddRentState extends State<AddRent> {
           return null;
         },
         onSaved: (value) {
-          itemQuantityEditingController.text = value!;
+          itemQuantityController.text = value!;
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
@@ -251,8 +261,8 @@ class _AddRentState extends State<AddRent> {
           ),
         ));
 
-    // Next button
-    final placeItemBtn = Material(
+    // Update button
+    final updateItemBtn = Material(
         elevation: 5,
         borderRadius: BorderRadius.circular(6),
         color: HexColor("#C35E12"),
@@ -260,10 +270,52 @@ class _AddRentState extends State<AddRent> {
           padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: 265,
           onPressed: () {
-            postDetailsToFirestore();
+            postRentItemToFirestore();
           },
           child: const Text(
-            "Place Item",
+            "Save",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                fontSize: 15, color: Colors.white, fontWeight: FontWeight.w600),
+          ),
+        ));
+
+    // Delete button
+    final deleteItemBtn = Material(
+        elevation: 5,
+        borderRadius: BorderRadius.circular(6),
+        color: HexColor("#E91B1B"),
+        child: MaterialButton(
+          padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+          minWidth: 265,
+          onPressed: () {
+            // widget.docId.reference.delete().whenComplete(() {
+            //   Navigator.pushReplacement(context,
+            //       MaterialPageRoute(builder: (context) => LendedItems()));
+            // });
+            showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                      title: const Text("Are you sure to delete this item?"),
+                      actions: [
+                        TextButton(
+                            onPressed: () => {
+                                  widget.docId.reference
+                                      .delete()
+                                      .whenComplete(() {
+                                    Navigator.pop(
+                                        context,
+                                        new MaterialPageRoute(
+                                            builder: (context) =>
+                                                new LendedItems()));
+                                  })
+                                },
+                            child: const Text("Ok"))
+                      ],
+                    ));
+          },
+          child: const Text(
+            "Delete",
             textAlign: TextAlign.center,
             style: TextStyle(
                 fontSize: 15, color: Colors.white, fontWeight: FontWeight.w600),
@@ -271,52 +323,34 @@ class _AddRentState extends State<AddRent> {
         ));
 
     return Scaffold(
-        extendBodyBehindAppBar: true,
+        // extendBodyBehindAppBar: true,
         backgroundColor: Colors.white,
         appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: HexColor("#C35E12"),
-                ),
-                // passing this to our root
-                onPressed: () {
-                  Navigator.of(context).pop();
-                })),
+          title: const Text(
+            "Edit Rent Item",
+          ),
+          leading: IconButton(
+              icon: const Icon(
+                Icons.arrow_back,
+              ),
+              // passing this to our root
+              onPressed: () {
+                Navigator.of(context).pop();
+              }),
+        ),
         body: Center(
           child: SingleChildScrollView(
             child: Container(
               alignment: Alignment.topCenter,
               color: Colors.white,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(36, 80, 36, 36),
+                padding: const EdgeInsets.all(36),
                 child: Form(
                     key: _formKey,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        SizedBox(
-                          height: 120,
-                          child: Image.asset(
-                            "assets/logo.png",
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        const Text("Add Item",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 20)),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
                         itemNameField,
                         const SizedBox(
                           height: 10,
@@ -333,12 +367,9 @@ class _AddRentState extends State<AddRent> {
                         const SizedBox(
                           height: 25,
                         ),
-                        SizedBox(
-                          height: 160,
-                          child: _image == null
-                              ? Image.asset("assets/square-album.png")
-                              : Image.file(_image!),
-                        ),
+                        _image != null
+                            ? Image.file(_image!)
+                            : _imageItem(refId: widget.docId.id),
                         const SizedBox(
                           height: 20,
                         ),
@@ -350,10 +381,11 @@ class _AddRentState extends State<AddRent> {
                         const SizedBox(
                           height: 20,
                         ),
-                        placeItemBtn,
+                        updateItemBtn,
                         const SizedBox(
-                          height: 25,
+                          height: 10,
                         ),
+                        deleteItemBtn
                       ],
                     )),
               ),
@@ -362,34 +394,75 @@ class _AddRentState extends State<AddRent> {
         ));
   }
 
-  postDetailsToFirestore() async {
-    // calling our firestore
-    // calling our user model
-    // sending these values
-
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    User? user = _auth.currentUser;
-
+  postRentItemToFirestore() async {
     RentItemModel rentItemModel = RentItemModel();
     // writing all the values
-    rentItemModel.uid = user!.uid;
-    rentItemModel.itemName = itemNameEditingController.text.toUpperCase();
-    rentItemModel.itemDescription = itemDescriptionEditingController.text;
-    rentItemModel.itemPrice = itemPriceEditingController.text;
-    rentItemModel.itemQuantity = itemQuantityEditingController.text;
+    rentItemModel.uid = _auth.currentUser!.uid;
+    rentItemModel.itemName = itemNameController.text.toUpperCase();
+    rentItemModel.itemDescription = itemDescriptionController.text;
+    rentItemModel.itemPrice = itemPriceController.text;
+    rentItemModel.itemQuantity = itemQuantityController.text;
+    rentItemModel.itemCreated = DateTime.now();
 
-    await firebaseFirestore
-        .collection("rent-items")
-        .add(rentItemModel.toMap())
-        .then((value) {
-      firebaseFirestore
-          .collection("rent-items")
-          .doc(value.id)
-          .update({'postID': value.id});
-      uploadImage(value.id);
+    // uploading image and creating downloadURL
+    uploadImage();
+
+    await widget.docId.reference.set(rentItemModel.toMap()).whenComplete(() {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LendedItems(),
+          ));
     });
-    // Fluttertoast.showToast(msg: "For rent item created successfully");
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => RentItemThankYouScreen()));
+  }
+}
+
+class _imageItem extends StatelessWidget {
+  _imageItem({Key? key, required this.refId}) : super(key: key);
+
+  String? refId;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection("rent-items")
+          .doc(refId)
+          .collection("images")
+          .snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) {
+          return SizedBox(
+              height: 80,
+              width: 80,
+              child: Image.asset("assets/square-album.png"));
+        } else {
+          // return ListView.builder(
+          //     itemCount: snapshot.data!.docs.length,
+          //     itemBuilder: (BuildContext context, int index) {
+          //       String url = snapshot.data!.docs[index]["downloadURL"];
+          //       return GestureDetector(
+          //         onTap: () {
+          //           print("images");
+          //         },
+          //         child: CircleAvatar(
+          //           radius: 30,
+          //           backgroundImage: NetworkImage(url),
+          //         ),
+          //       );
+          //     });
+          String url = snapshot.data!.docs[0]["downloadURL"];
+          return GestureDetector(
+              onTap: () {
+                print("image");
+              },
+              child: SizedBox(
+                  child: Image.network(
+                url,
+                fit: BoxFit.contain,
+              )));
+        }
+      },
+    );
   }
 }

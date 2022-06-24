@@ -2,62 +2,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:rentool/chat/chatpage.dart';
-import 'package:rentool/chat/people.dart';
 
-import '../buildmaterialcolor.dart';
-
-class RecentChatPeople extends StatefulWidget {
-  RecentChatPeople({Key? key}) : super(key: key);
+class NotificationScreen extends StatefulWidget {
+  const NotificationScreen({Key? key}) : super(key: key);
 
   @override
-  State<RecentChatPeople> createState() => _RecentChatPeopleState();
+  State<NotificationScreen> createState() => _NotificationScreenState();
 }
 
-class _RecentChatPeopleState extends State<RecentChatPeople> {
-  var currentUser = FirebaseAuth.instance.currentUser!.uid;
-  final searchItemEditingController = new TextEditingController();
-  String? searchString;
+class _NotificationScreenState extends State<NotificationScreen> {
+  User? user = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
-    final searchItemField = TextFormField(
-        autofocus: false,
-        controller: searchItemEditingController,
-        keyboardType: TextInputType.name,
-        // validator: (value) {
-        //   RegExp regex = new RegExp(r'^.{6,}$');
-        //   if (value!.isEmpty) {
-        //     return ("Fullname cannot be empty");
-        //   }
-        //   if (!regex.hasMatch(value)) {
-        //     return ("Please enter valid name(Min. 6 Character)");
-        //   }
-        //   return null;
-        // },
-        onChanged: (val) {
-          setState(() {
-            searchString = val.toUpperCase();
-            print(searchString);
-          });
-        },
-        textInputAction: TextInputAction.done,
-        decoration: InputDecoration(
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: BorderSide(
-                  color: buildMaterialColor(const Color(0xFFC35E12)),
-                  width: 2.0),
-            ),
-            prefixIcon: const Icon(Icons.search),
-            contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
-            labelText: "Search a person"));
     return Scaffold(
-      floatingActionButton: buildRentalButton(),
-      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -75,7 +33,7 @@ class _RecentChatPeopleState extends State<RecentChatPeople> {
                         left: 15, right: 15, top: 15, bottom: 5),
                     child: Center(
                         child: Text(
-                      "Recent Chats",
+                      "Notifications",
                       textAlign: TextAlign.center,
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -86,7 +44,7 @@ class _RecentChatPeopleState extends State<RecentChatPeople> {
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection("users")
-            .doc(currentUser)
+            .doc(user!.uid)
             .collection("chatted-friend")
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -110,17 +68,13 @@ class _RecentChatPeopleState extends State<RecentChatPeople> {
                   itemBuilder: (_, index) {
                     return GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => chatpage(
-                                      friendEmail:
-                                          "${snapshot.data!.docChanges[index].doc['friend-chat-email']}",
-                                      friendName:
-                                          "${snapshot.data!.docChanges[index].doc['friend-chat-name']}",
-                                      friendUid:
-                                          "${snapshot.data!.docChanges[index].doc['uid']}",
-                                    )));
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (_) => ItemDetails(
+                        //               refId: snapshot.data!.docChanges[index]
+                        //                   .doc.reference.id,
+                        //             )));
                         print(
                             "${snapshot.data!.docChanges[index].doc.reference.id}");
                       },
@@ -147,10 +101,10 @@ class _RecentChatPeopleState extends State<RecentChatPeople> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              leading: _imageItem(
-                                refId:
-                                    snapshot.data!.docChanges[index].doc['uid'],
-                              ),
+                              // leading: _imageItem(
+                              //   refId:
+                              //       snapshot.data!.docChanges[index].doc['uid'],
+                              // ),
                               subtitle: Text(
                                 "Email: ${snapshot.data!.docChanges[index].doc['friend-chat-email']} \nContact#: ${snapshot.data!.docChanges[index].doc['friend-chat-contact']}",
                                 style: const TextStyle(fontSize: 16),
@@ -180,54 +134,6 @@ class _RecentChatPeopleState extends State<RecentChatPeople> {
           );
         },
       ),
-    );
-  }
-
-  Widget buildRentalButton() => FloatingActionButton.extended(
-        label: const Text("Person"),
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => People()));
-        },
-        icon: const Icon(Icons.add_rounded),
-        backgroundColor: HexColor("#E4B43D"),
-      );
-}
-
-class _imageItem extends StatelessWidget {
-  _imageItem({Key? key, this.refId}) : super(key: key);
-
-  String? refId;
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection("users")
-          .doc(refId)
-          .collection("images-user-selfie")
-          .snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (!snapshot.hasData) {
-          return SizedBox(
-              height: 80,
-              width: 80,
-              child: Image.asset("assets/square-album.png"));
-        } else {
-          String url = snapshot.data!.docs[0]["downloadURL"];
-          return GestureDetector(
-              onTap: () {
-                print("image");
-              },
-              child: SizedBox(
-                  width: 60,
-                  height: 80,
-                  child: Image.network(
-                    url,
-                    fit: BoxFit.cover,
-                  )));
-        }
-      },
     );
   }
 }
