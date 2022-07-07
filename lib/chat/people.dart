@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/chat/chatpage.dart';
-import 'package:rentool/chat/recent_chat_people.dart';
 import 'package:rentool/screens/home_screen.dart';
 
 import '../buildmaterialcolor.dart';
@@ -64,7 +63,7 @@ class _PeopleState extends State<People> {
                 Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => HomeScreen(tabIndex: 3)))
+                            builder: (context) => HomeScreen(tabIndex: 1)))
                     .then((value) {
                   setState(() {});
                 });
@@ -74,7 +73,10 @@ class _PeopleState extends State<People> {
                 color: Colors.black,
               )),
         ),
-        title: const Text("People"),
+        title: const Text(
+          "People",
+          style: TextStyle(color: Colors.black),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: false,

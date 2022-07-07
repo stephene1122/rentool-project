@@ -15,10 +15,10 @@ class _RegistrationScreenNotifState extends State<RegistrationScreenNotif> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Almost Done")),
+      appBar: AppBar(title: const Text("Almost Done")),
       body: Center(
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -30,30 +30,30 @@ class _RegistrationScreenNotifState extends State<RegistrationScreenNotif> {
                   fit: BoxFit.contain,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 50,
               ),
-              Text(
+              const Text(
                 "Your almost done!",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 25,
               ),
-              Text(
+              const Text(
                 "We will validate your account and will notify you at the email address you've provided",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 35,
               ),
-              Text(
+              const Text(
                 "Note: The only allowed users for this app are living at Tagum City and wait for several time for us to validate your profile thank you",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontStyle: FontStyle.italic, fontSize: 15),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 35,
               ),
               GestureDetector(

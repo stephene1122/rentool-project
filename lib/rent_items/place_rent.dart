@@ -254,7 +254,8 @@ class _PlaceRentDetailsState extends State<PlaceRentDetails> {
                                 ),
                                 Container(
                                   alignment: Alignment.center,
-                                  padding: EdgeInsets.only(top: 15, bottom: 15),
+                                  padding: const EdgeInsets.only(
+                                      top: 15, bottom: 15),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(6),
                                     color: buildMaterialColor(
@@ -308,10 +309,35 @@ class _PlaceRentDetailsState extends State<PlaceRentDetails> {
                                           20, 5, 20, 5),
                                       minWidth: 350,
                                       onPressed: () {
-                                        postLendedItem(
-                                            lenderDetails.uid,
-                                            lenderDetails.emailAddress,
-                                            lenderDetails.fullName);
+                                        if (lendItemDeliveryAddressController
+                                                .text ==
+                                            "") {
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) =>
+                                                  const AlertDialog(
+                                                    backgroundColor: Colors.red,
+                                                    contentPadding:
+                                                        EdgeInsets.fromLTRB(
+                                                            20, 23, 20, 23),
+                                                    title: Center(
+                                                        child: Text(
+                                                      "ALERT!",
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    )),
+                                                    content: Text(
+                                                        "Please input your delivery address!",
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white)),
+                                                  ));
+                                        } else {
+                                          postLendedItem(
+                                              lenderDetails.uid,
+                                              lenderDetails.emailAddress,
+                                              lenderDetails.fullName);
+                                        }
                                       },
                                       child: const Text(
                                         "Place Order",

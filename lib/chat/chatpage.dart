@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/model/chatted_friend_model.dart';
+import 'package:rentool/screens/home_screen.dart';
 import 'package:rentool/screens/login_screen.dart';
 import 'package:rentool/services/chatted_friend.dart';
 import '../model/user_model.dart';
@@ -36,6 +38,7 @@ class _chatpageState extends State<chatpage> {
   var chatDocId;
   var chatFriendId;
   var isChattedFriend;
+  var friendedUID;
 
   @override
   void initState() {
@@ -70,6 +73,8 @@ class _chatpageState extends State<chatpage> {
     ChattedFriendService()
         .getFriendChat(_auth.currentUser!.uid, widget.friendUid!)
         .then((QuerySnapshot d) {
+      friendedUID = d.docs[0]["uid"];
+      print(friendedUID);
       if (d.docs.isNotEmpty) {
         isChattedFriend = true;
       } else {
@@ -90,7 +95,7 @@ class _chatpageState extends State<chatpage> {
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) {
-          return Text("data");
+          return const Text("data");
         } else {
           String url = snapshot.data!.docs[0]['downloadURL'];
           return CircleAvatar(
@@ -105,6 +110,20 @@ class _chatpageState extends State<chatpage> {
       appBar: AppBar(
         title: Text(
           '${widget.friendName}',
+        ),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+          ),
+          // passing this to our root
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => HomeScreen(
+                          tabIndex: 2,
+                        )));
+          },
         ),
         actions: [
           MaterialButton(
@@ -156,11 +175,11 @@ class _chatpageState extends State<chatpage> {
                       contentPadding: const EdgeInsets.only(
                           left: 14.0, bottom: 8.0, top: 8.0),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: new BorderSide(color: Colors.purple),
+                        borderSide: new BorderSide(color: HexColor("#C35E12")),
                         borderRadius: new BorderRadius.circular(10),
                       ),
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: new BorderSide(color: Colors.purple),
+                        borderSide: new BorderSide(color: HexColor("#C35E12")),
                         borderRadius: new BorderRadius.circular(10),
                       ),
                     ),
@@ -184,7 +203,7 @@ class _chatpageState extends State<chatpage> {
                         'isSeen': false
                       });
                       // adding chat friend list
-                      if (isChattedFriend == false) {
+                      if (widget.friendUid != friendedUID) {
                         fs
                             .collection("users")
                             .doc(_auth.currentUser!.uid)

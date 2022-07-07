@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/borrow_items/borrow_item_list.dart';
 import 'package:rentool/rent_items/rent_list.dart';
+import 'package:rentool/side_navbar.dart';
 import '../model/user_model.dart';
+import '../rent_items/add_rent.dart';
+import 'hero_image.dart';
 import 'login_screen.dart';
 
 class HomeScreenDefault extends StatefulWidget {
@@ -56,13 +59,15 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
 
   @override
   Widget build(BuildContext context) {
+    final userTitle = loggedInUser.isAdmin;
+
     // Borrowed Items btn
     final borrowedItemsBtn = Material(
         elevation: 5,
         borderRadius: BorderRadius.circular(6),
         color: HexColor("#C35E12"),
         child: MaterialButton(
-          padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+          padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: 265,
           onPressed: () {
             Navigator.push(
@@ -115,23 +120,32 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
           return SizedBox(
               height: 80, child: Image.asset("assets/square-image.png"));
         }
-        // if (snapshot.connectionState == ConnectionState.waiting) {
-        //   return const Center(
-        //     child: CircularProgressIndicator(),
-        //   );
-        // }
-        else {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
           String url = snapshot.data!.docs[0]['downloadURL'];
-          return CircleAvatar(
-            radius: 100 / 2,
-            backgroundColor: Colors.grey.shade800,
-            backgroundImage: NetworkImage(url),
+          return GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => HeroImage(tagUrl: url)));
+            },
+            child: Hero(
+              tag: url,
+              child: CircleAvatar(
+                radius: 100 / 2,
+                backgroundColor: Colors.grey.shade800,
+                backgroundImage: NetworkImage(url),
+              ),
+            ),
           );
         }
       },
     );
 
     return Scaffold(
+      drawer: loggedInUser.isAdmin == "1" ? SideNavBar() : null,
       resizeToAvoidBottomInset: true,
       appBar: _appBar(),
       floatingActionButton: buildRentalButton(),
@@ -160,28 +174,6 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
               const SizedBox(
                 height: 25,
               ),
-              // StreamBuilder<QuerySnapshot>(
-              //   stream: usersSelfie,
-              //   builder: (
-              //     BuildContext context,
-              //     AsyncSnapshot<QuerySnapshot> snapshot,
-              //   ) {
-              //     if (snapshot.hasError) {
-              //       return Text("Something went wrong!");
-              //     }
-              //     if (snapshot.connectionState == ConnectionState.waiting) {
-              //       return Text("Loading");
-              //     }
-              //     final data = snapshot.requireData;
-              //     return ListView.builder(
-              //       itemCount: data.size,
-              //       itemBuilder: (context, index) {
-              //         String url = data.docs[index]['downloadURL'];
-              //         return Text(url);
-              //       },
-              //     );
-              //   },
-              // ),
               userImage,
               const SizedBox(
                 height: 15,
@@ -205,12 +197,10 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
   }
 
   Widget buildRentalButton() => FloatingActionButton.extended(
-        label: const Text("Rental"),
+        label: const Text("Create Item"),
         onPressed: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => LendedItems(userId: loggedInUser.uid)));
+              context, MaterialPageRoute(builder: (context) => AddRent()));
         },
         icon: const Icon(Icons.construction_rounded),
         backgroundColor: HexColor("#E4B43D"),

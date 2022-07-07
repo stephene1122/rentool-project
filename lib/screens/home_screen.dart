@@ -1,21 +1,19 @@
+import 'dart:html';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:rentool/chat/people.dart';
 import 'package:rentool/chat/recent_chat_people.dart';
-import 'package:rentool/imageupload/registration_upload_validid.dart';
 import 'package:rentool/model/user_model.dart';
 import 'package:rentool/screens/home_screen_default.dart';
 import 'package:rentool/screens/lend_items_screen.dart';
-import 'login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key? key, this.tabIndex}) : super(key: key);
 
-  int? tabIndex;
+  var tabIndex;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -47,6 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
           inactiveColor: Colors.white,
           onTap: (tabIndex) {
             print("Clicked Tab $tabIndex");
+            // tapBar == 1;
+            // print(tapBar);
           },
           items: const [
             BottomNavigationBarItem(
@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
         tabBuilder: (context, tabIndex) {
           switch (tabIndex) {
             case 0:
-              return const LendItemsScreen();
+              return LendItemsScreen();
             case 1:
               return RecentChatPeople();
             case 2:
@@ -91,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             case 3:
             default:
-              return const HomeScreenDefault();
+              return HomeScreenDefault();
           }
         },
       );

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -5,6 +6,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/buildmaterialcolor.dart';
 import 'package:rentool/screens/home_screen.dart';
 import 'package:rentool/screens/registration_screen.dart';
+import 'package:rentool/services/user_admin.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -190,10 +192,25 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       await _auth
           .signInWithEmailAndPassword(email: email, password: password)
-          .then((uid) => {
-                Fluttertoast.showToast(msg: "Login Successful"),
-                Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => HomeScreen()))
+          .then((value) => {
+                print(value.user!.uid),
+                userAdminService()
+                    .isUserAdmin(value.user!.uid)
+                    .then((QuerySnapshot d) {
+                  var isLoginUserValidated = d.docs[0]['isUserGranted'];
+                  print(isLoginUserValidated);
+                  if (isLoginUserValidated == "1") {
+                    Fluttertoast.showToast(msg: "Login Successful");
+                    Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => HomeScreen()));
+                  } else {
+                    Fluttertoast.showToast(
+                        msg: "Your account is not yet validated");
+                    FirebaseAuth.instance.signOut();
+                    // Navigator.of(context).pushReplacement(
+                    //     MaterialPageRoute(builder: (context) => LoginScreen()));
+                  }
+                }),
               })
           .catchError((e) {
         Fluttertoast.showToast(msg: e!.message);

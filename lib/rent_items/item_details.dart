@@ -8,6 +8,7 @@ import 'package:rentool/model/lend_items_model.dart';
 import 'package:rentool/model/rent_items_model.dart';
 import 'package:rentool/model/user_model.dart';
 import 'package:rentool/rent_items/place_rent.dart';
+import 'package:rentool/screens/hero_image.dart';
 import 'package:rentool/screens/home_screen.dart';
 import '../buildmaterialcolor.dart';
 
@@ -39,7 +40,6 @@ class _ItemDetailsState extends State<ItemDetails> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     FirebaseFirestore.instance
         .collection("rent-items")
@@ -74,9 +74,12 @@ class _ItemDetailsState extends State<ItemDetails> {
       appBar: AppBar(
         leading: IconButton(
             onPressed: () {
-              Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()))
-                  .then((value) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HomeScreen(
+                            tabIndex: 0,
+                          ))).then((value) {
                 setState(() {});
               });
             },
@@ -132,15 +135,42 @@ class _ItemDetailsState extends State<ItemDetails> {
                                         width: 2),
                                   ),
                                   child: Text(
-                                    "${itemDetails.itemName}",
-                                    style: TextStyle(fontSize: 15),
+                                    "ITEM: ${itemDetails.itemName}",
+                                    style: const TextStyle(fontSize: 15),
                                   ),
                                 ),
                                 const SizedBox(
                                   height: 10,
                                 ),
                                 Container(
-                                  height: 150,
+                                    height: 150,
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.only(
+                                        top: 10, bottom: 10),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(6),
+                                      color: buildMaterialColor(
+                                          const Color(0xFFE3B13B)),
+                                      border: Border.all(
+                                          color: buildMaterialColor(
+                                              const Color(0xFFC35E12)),
+                                          width: 2),
+                                    ),
+                                    child: Align(
+                                      alignment: Alignment.topCenter,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 10, right: 10),
+                                        child: Text(
+                                          "DESCRIPTION: ${itemDetails.itemDescription}",
+                                          style: const TextStyle(fontSize: 15),
+                                        ),
+                                      ),
+                                    )),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
                                   alignment: Alignment.center,
                                   padding: const EdgeInsets.only(
                                       top: 10, bottom: 10),
@@ -154,29 +184,8 @@ class _ItemDetailsState extends State<ItemDetails> {
                                         width: 2),
                                   ),
                                   child: Text(
-                                    "${itemDetails.itemDescription}",
-                                    style: TextStyle(fontSize: 15),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Container(
-                                  alignment: Alignment.center,
-                                  padding: const EdgeInsets.only(
-                                      top: 10, bottom: 10),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(6),
-                                    color: buildMaterialColor(
-                                        const Color(0xFFE3B13B)),
-                                    border: Border.all(
-                                        color: buildMaterialColor(
-                                            const Color(0xFFC35E12)),
-                                        width: 2),
-                                  ),
-                                  child: Text(
-                                    "${lenderUser.fullName}",
-                                    style: TextStyle(fontSize: 15),
+                                    "LENDER: ${lenderUser.fullName}",
+                                    style: const TextStyle(fontSize: 15),
                                   ),
                                 ),
                                 const SizedBox(
@@ -202,7 +211,7 @@ class _ItemDetailsState extends State<ItemDetails> {
                                               width: 2),
                                         ),
                                         child: Text(
-                                          "${itemDetails.itemQuantity}",
+                                          "${itemDetails.itemQuantity} items",
                                           style: TextStyle(fontSize: 15),
                                         ),
                                       ),
@@ -330,6 +339,30 @@ class _ItemDetailsState extends State<ItemDetails> {
                                           20, 5, 20, 5),
                                       minWidth: 350,
                                       onPressed: () {
+                                        if (lendItemQuantityController.text ==
+                                                "" &&
+                                            lendItemDayController.text == "") {
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) =>
+                                                  const AlertDialog(
+                                                    backgroundColor: Colors.red,
+                                                    contentPadding:
+                                                        EdgeInsets.fromLTRB(
+                                                            20, 23, 20, 23),
+                                                    title: Center(
+                                                        child: Text(
+                                                      "ALERT!",
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    )),
+                                                    content: Text(
+                                                        "Please input Quantity and Days to rent",
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white)),
+                                                  ));
+                                        }
                                         postLendedItem();
                                       },
                                       child: const Text(
@@ -416,117 +449,10 @@ class _ItemDetailsState extends State<ItemDetails> {
   }
 }
 
-// class _itemField extends StatelessWidget {
-//   _itemField({Key? key, this.fieldName}) : super(key: key);
-
-//   String? fieldName;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       decoration: BoxDecoration(
-//         borderRadius: BorderRadius.circular(6),
-//         color: buildMaterialColor(const Color(0xFFE3B13B)),
-//         border: Border.all(
-//             color: buildMaterialColor(const Color(0xFFC35E12)), width: 2),
-//       ),
-//       alignment: Alignment.center,
-//       width: 350,
-//       padding: EdgeInsets.fromLTRB(25, 10, 25, 10),
-//       margin: EdgeInsets.only(
-//         top: 10,
-//       ),
-//       child: Text("${fieldName}"),
-//     );
-//   }
-// }
-
-// class _itemFieldSmall extends StatelessWidget {
-//   _itemFieldSmall({Key? key, this.fieldNameSmall}) : super(key: key);
-//   String? fieldNameSmall;
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       decoration: BoxDecoration(
-//         borderRadius: BorderRadius.circular(6),
-//         color: buildMaterialColor(const Color(0xFFE3B13B)),
-//         border: Border.all(
-//             color: buildMaterialColor(const Color(0xFFC35E12)), width: 2),
-//       ),
-//       alignment: Alignment.center,
-//       width: 150,
-//       padding: EdgeInsets.fromLTRB(25, 10, 25, 10),
-//       margin: EdgeInsets.only(
-//         top: 10,
-//       ),
-//       child: Text("${fieldNameSmall}"),
-//     );
-//   }
-// }
-
-// class _customTextfield extends StatelessWidget {
-//   _customTextfield({Key? key, this.fieldName}) : super(key: key);
-
-//   String? fieldName;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       decoration: BoxDecoration(
-//         borderRadius: BorderRadius.circular(6),
-//         color: buildMaterialColor(const Color(0xFFE3B13B)),
-//         border: Border.all(
-//             color: buildMaterialColor(const Color(0xFFC35E12)), width: 2),
-//       ),
-//       alignment: Alignment.center,
-//       width: 150,
-//       padding: EdgeInsets.fromLTRB(25, 10, 25, 10),
-//       margin: EdgeInsets.only(
-//         top: 10,
-//       ),
-//       child: TextField(
-//         decoration: InputDecoration(
-//             hintText: "${fieldName}", border: OutlineInputBorder()),
-//       ),
-//     );
-//   }
-// }
-
-// class _customRow extends StatelessWidget {
-//   const _customRow({Key? key}) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Row(
-//       mainAxisAlignment: MainAxisAlignment.spaceAround,
-//       children: [
-//         Column(
-//           children: [
-//             TextFormField(
-//               textAlign: TextAlign.center,
-//               readOnly: true,
-//               decoration: InputDecoration(
-//                 contentPadding: EdgeInsets.only(top: 5, bottom: 5),
-//                 border:
-//                     OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-//                 focusColor: buildMaterialColor(const Color(0xFFC35E12)),
-//               ),
-//               initialValue: "Item Name",
-//             ),
-//           ],
-//         ),
-//         Column(
-//           children: [],
-//         )
-//       ],
-//     );
-//   }
-// }
-
 class _imageItem extends StatelessWidget {
-  _imageItem({Key? key, this.imageRefId}) : super(key: key);
+  _imageItem({Key? key, required this.imageRefId}) : super(key: key);
 
-  String? imageRefId;
+  String imageRefId;
 
   @override
   Widget build(BuildContext context) {
@@ -555,9 +481,18 @@ class _imageItem extends StatelessWidget {
                     color: buildMaterialColor(const Color(0xFFC35E12)),
                     width: 2),
               ),
-              child: Image.network(
-                url,
-                fit: BoxFit.cover,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => HeroImage(tagUrl: url)));
+                },
+                child: Hero(
+                  tag: url,
+                  child: Image.network(
+                    url,
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ));
         }
       },
