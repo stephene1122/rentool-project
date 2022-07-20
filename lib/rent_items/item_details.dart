@@ -68,8 +68,6 @@ class _ItemDetailsState extends State<ItemDetails> {
             AppBar().preferredSize.height -
             MediaQuery.of(context).padding.top;
 
-    num item_quantity = 10;
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -104,279 +102,275 @@ class _ItemDetailsState extends State<ItemDetails> {
                       )),
                 ),
                 SingleChildScrollView(
-                  child: Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      color: buildMaterialColor(const Color(0xFFE3B13B)),
+                      border: Border.all(
+                          color: buildMaterialColor(const Color(0xFFC35E12))),
+                    ),
                     child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(6),
-                          color: buildMaterialColor(const Color(0xFFE3B13B)),
-                          border: Border.all(
-                              color:
-                                  buildMaterialColor(const Color(0xFFC35E12))),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              children: [
-                                Container(
-                                  alignment: Alignment.center,
-                                  padding: const EdgeInsets.only(
-                                      top: 10, bottom: 10),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(6),
-                                    color: buildMaterialColor(
-                                        const Color(0xFFE3B13B)),
-                                    border: Border.all(
-                                        color: buildMaterialColor(
-                                            const Color(0xFFC35E12)),
-                                        width: 2),
-                                  ),
-                                  child: Text(
-                                    "ITEM: ${itemDetails.itemName}",
-                                    style: const TextStyle(fontSize: 15),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Container(
-                                    height: 150,
-                                    alignment: Alignment.center,
-                                    padding: const EdgeInsets.only(
-                                        top: 10, bottom: 10),
-                                    decoration: BoxDecoration(
+                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            TextFormField(
+                                readOnly: true,
+                                autofocus: false,
+                                controller: TextEditingController(
+                                    text: itemDetails.itemName),
+                                textInputAction: TextInputAction.next,
+                                decoration: InputDecoration(
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: buildMaterialColor(
+                                              Color(0xFFC35E12)),
+                                          width: 2.0),
+                                    ),
+                                    contentPadding: const EdgeInsets.fromLTRB(
+                                        20, 15, 20, 15),
+                                    border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(6),
-                                      color: buildMaterialColor(
-                                          const Color(0xFFE3B13B)),
-                                      border: Border.all(
-                                          color: buildMaterialColor(
-                                              const Color(0xFFC35E12)),
-                                          width: 2),
                                     ),
-                                    child: Align(
-                                      alignment: Alignment.topCenter,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 10, right: 10),
-                                        child: Text(
-                                          "DESCRIPTION: ${itemDetails.itemDescription}",
-                                          style: const TextStyle(fontSize: 15),
-                                        ),
-                                      ),
-                                    )),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Container(
-                                  alignment: Alignment.center,
-                                  padding: const EdgeInsets.only(
-                                      top: 10, bottom: 10),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(6),
-                                    color: buildMaterialColor(
-                                        const Color(0xFFE3B13B)),
-                                    border: Border.all(
-                                        color: buildMaterialColor(
-                                            const Color(0xFFC35E12)),
-                                        width: 2),
-                                  ),
-                                  child: Text(
-                                    "LENDER: ${lenderUser.fullName}",
-                                    style: const TextStyle(fontSize: 15),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        padding: const EdgeInsets.only(
-                                            top: 10, bottom: 10),
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(6),
+                                    labelText: "ITEM NAME")),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            TextFormField(
+                                minLines: 6,
+                                maxLines: null,
+                                readOnly: true,
+                                autofocus: false,
+                                controller: TextEditingController(
+                                    text: itemDetails.itemDescription),
+                                textInputAction: TextInputAction.next,
+                                decoration: InputDecoration(
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
                                           color: buildMaterialColor(
-                                              const Color(0xFFE3B13B)),
-                                          border: Border.all(
-                                              color: buildMaterialColor(
-                                                  const Color(0xFFC35E12)),
-                                              width: 2),
-                                        ),
-                                        child: Text(
-                                          "${itemDetails.itemQuantity} items",
-                                          style: TextStyle(fontSize: 15),
-                                        ),
-                                      ),
+                                              Color(0xFFC35E12)),
+                                          width: 2.0),
                                     ),
-                                    const SizedBox(
-                                      width: 20,
+                                    contentPadding: const EdgeInsets.fromLTRB(
+                                        20, 15, 20, 15),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
                                     ),
-                                    Expanded(
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        padding: const EdgeInsets.only(
-                                            top: 10, bottom: 10),
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(6),
+                                    labelText: "ITEM DESCRIPTION")),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            TextFormField(
+                                readOnly: true,
+                                autofocus: false,
+                                controller: TextEditingController(
+                                    text: lenderUser.fullName),
+                                textInputAction: TextInputAction.next,
+                                decoration: InputDecoration(
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
                                           color: buildMaterialColor(
-                                              const Color(0xFFE3B13B)),
-                                          border: Border.all(
-                                              color: buildMaterialColor(
-                                                  const Color(0xFFC35E12)),
-                                              width: 2),
-                                        ),
-                                        child: Text(
-                                          "₱${itemDetails.itemPrice} /Day",
-                                          style: TextStyle(fontSize: 15),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                _imageItem(imageRefId: widget.refId),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                      child: TextFormField(
-                                        controller: lendItemQuantityController,
-                                        keyboardType: TextInputType.number,
-                                        textInputAction: TextInputAction.next,
-                                        textAlign: TextAlign.center,
-                                        validator: (value) {
-                                          int valueQuantity = int.parse(value!);
-                                          if (value.isEmpty ||
-                                              value.length < 1) {
-                                            return 'Quantity cannot be empty';
-                                          }
-                                          if (value == 0 || value == "0") {
-                                            return "Quantity cannot be zero";
-                                          }
-                                          if (valueQuantity > item_quantity) {
-                                            return "Input must less than item quantity";
-                                          }
-                                        },
-                                        decoration: InputDecoration(
-                                          hintText: "Quantity to rent",
-                                          contentPadding: const EdgeInsets.only(
-                                              top: 5, bottom: 5),
-                                          border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(30)),
+                                              Color(0xFFC35E12)),
+                                          width: 2.0),
+                                    ),
+                                    contentPadding: const EdgeInsets.fromLTRB(
+                                        20, 15, 20, 15),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    labelText: "LENDER NAME")),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                      readOnly: true,
+                                      autofocus: false,
+                                      controller: TextEditingController(
+                                          text:
+                                              "${itemDetails.itemQuantity} left"),
+                                      textInputAction: TextInputAction.next,
+                                      decoration: InputDecoration(
                                           enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                              borderSide: BorderSide(
-                                                  width: 2,
-                                                  color: buildMaterialColor(
-                                                      const Color(
-                                                          0xFFC35E12)))),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 20,
-                                    ),
-                                    Expanded(
-                                      child: TextFormField(
-                                        controller: lendItemDayController,
-                                        keyboardType: TextInputType.number,
-                                        textAlign: TextAlign.center,
-                                        validator: (value) {
-                                          if (value!.isEmpty ||
-                                              value.length < 1) {
-                                            return 'Days cannot be empty';
-                                          }
-                                          if (value == 0 || value == "0") {
-                                            return "Day cannot be zero";
-                                          }
-                                        },
-                                        decoration: InputDecoration(
-                                          hintText: "Days to rent",
-                                          contentPadding: const EdgeInsets.only(
-                                              top: 5, bottom: 5),
+                                            borderSide: BorderSide(
+                                                color: buildMaterialColor(
+                                                    Color(0xFFC35E12)),
+                                                width: 2.0),
+                                          ),
+                                          contentPadding:
+                                              const EdgeInsets.fromLTRB(
+                                                  20, 15, 20, 15),
                                           border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(30)),
-                                          enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                              borderSide: BorderSide(
-                                                  width: 2,
-                                                  color: buildMaterialColor(
-                                                      const Color(
-                                                          0xFFC35E12)))),
-                                        ),
-                                      ),
-                                    )
-                                  ],
+                                            borderRadius:
+                                                BorderRadius.circular(6),
+                                          ),
+                                          labelText: "ITEM QUANTITY")),
                                 ),
                                 const SizedBox(
-                                  height: 20,
+                                  width: 20,
                                 ),
-                                Material(
-                                    elevation: 5,
-                                    borderRadius: BorderRadius.circular(30),
-                                    color: HexColor("#C35E12"),
-                                    child: MaterialButton(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          20, 5, 20, 5),
-                                      minWidth: 350,
-                                      onPressed: () {
-                                        if (lendItemQuantityController.text ==
-                                                "" &&
-                                            lendItemDayController.text == "") {
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) =>
-                                                  const AlertDialog(
-                                                    backgroundColor: Colors.red,
-                                                    contentPadding:
-                                                        EdgeInsets.fromLTRB(
-                                                            20, 23, 20, 23),
-                                                    title: Center(
-                                                        child: Text(
-                                                      "ALERT!",
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    )),
-                                                    content: Text(
-                                                        "Please input Quantity and Days to rent",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white)),
-                                                  ));
-                                        }
-                                        postLendedItem();
-                                      },
-                                      child: const Text(
-                                        "Rent Now",
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                    ))
+                                Expanded(
+                                  child: TextFormField(
+                                      readOnly: true,
+                                      autofocus: false,
+                                      controller: TextEditingController(
+                                          text:
+                                              "₱${itemDetails.itemPrice} /Day"),
+                                      textInputAction: TextInputAction.next,
+                                      decoration: InputDecoration(
+                                          enabledBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: buildMaterialColor(
+                                                    Color(0xFFC35E12)),
+                                                width: 2.0),
+                                          ),
+                                          contentPadding:
+                                              const EdgeInsets.fromLTRB(
+                                                  20, 15, 20, 15),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(6),
+                                          ),
+                                          labelText: "ITEM PRICE")),
+                                )
                               ],
                             ),
-                          ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            _imageItem(imageRefId: widget.refId),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    autofocus: true,
+                                    controller: lendItemQuantityController,
+                                    keyboardType: TextInputType.number,
+                                    textInputAction: TextInputAction.next,
+                                    textAlign: TextAlign.center,
+                                    validator: (value) {
+                                      int valueQuantity = int.parse(value!);
+                                      if (value.isEmpty || value.length < 1) {
+                                        return 'Quantity cannot be empty';
+                                      }
+                                      if (value == 0 || value == "0") {
+                                        return "      Quantity cannot be zero";
+                                      }
+                                      num itemQuantity =
+                                          int.parse(itemDetails.itemQuantity!);
+                                      num quantity = int.parse(
+                                          lendItemQuantityController.text);
+                                      if (itemQuantity < quantity) {
+                                        return "      Input right amount!";
+                                      }
+                                    },
+                                    decoration: InputDecoration(
+                                      labelText: "   QUANTITY TO RENT",
+                                      contentPadding: const EdgeInsets.only(
+                                          top: 5, bottom: 5),
+                                      border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30)),
+                                      enabledBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                          borderSide: BorderSide(
+                                              width: 2,
+                                              color: buildMaterialColor(
+                                                  const Color(0xFFC35E12)))),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 20,
+                                ),
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: lendItemDayController,
+                                    keyboardType: TextInputType.number,
+                                    textAlign: TextAlign.center,
+                                    validator: (value) {
+                                      if (value!.isEmpty || value.length < 1) {
+                                        return '      Day cannot be empty!';
+                                      }
+                                      if (value == 0 || value == "0") {
+                                        return "      Day cannot be zero!";
+                                      }
+                                    },
+                                    decoration: InputDecoration(
+                                      labelText: "    DAY TO RENT",
+                                      contentPadding: const EdgeInsets.only(
+                                          top: 5, bottom: 5),
+                                      border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30)),
+                                      enabledBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                          borderSide: BorderSide(
+                                              width: 2,
+                                              color: buildMaterialColor(
+                                                  const Color(0xFFC35E12)))),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Material(
+                                elevation: 5,
+                                borderRadius: BorderRadius.circular(30),
+                                color: HexColor("#C35E12"),
+                                child: MaterialButton(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(20, 5, 20, 5),
+                                  minWidth: 350,
+                                  onPressed: () {
+                                    if (lendItemQuantityController.text == "" &&
+                                        lendItemDayController.text == "") {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) =>
+                                              const AlertDialog(
+                                                backgroundColor: Colors.red,
+                                                contentPadding:
+                                                    EdgeInsets.fromLTRB(
+                                                        20, 23, 20, 23),
+                                                title: Center(
+                                                    child: Text(
+                                                  "ALERT!",
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                )),
+                                                content: Text(
+                                                    "Please input amount on QUANTITY and DAYS to rent",
+                                                    style: TextStyle(
+                                                        color: Colors.white)),
+                                              ));
+                                    } else {
+                                      postLendedItem();
+                                    }
+                                  },
+                                  child: const Text(
+                                    "Rent Now",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                ))
+                          ],
                         ),
                       ),
                     ),
@@ -411,6 +405,14 @@ class _ItemDetailsState extends State<ItemDetails> {
       lendShippingController.text = d.toString();
       lendTotalpaymentController.text = e.toString();
 
+      // rent period calculation
+      int dayLended = int.parse(lendItemDayController.text);
+      final DateTime dateFrom = DateTime.now();
+      final DateTime dateTo = dateFrom.add(Duration(days: dayLended));
+      String fdateFrom = DateFormat().format(dateFrom).toString();
+      String fdateTo = DateFormat().format(dateTo);
+      String rentCountDown = DateFormat("yyyy-MM-dd HH:mm:ss").format(dateTo);
+
       // writing all the values
       lendedModel.uid = lendedModel.itemId = user!.uid;
       lendedModel.itemId = widget.refId;
@@ -419,6 +421,10 @@ class _ItemDetailsState extends State<ItemDetails> {
       lendedModel.subtotalPayment = lendSubtotalController.text;
       lendedModel.shippingPayment = lendShippingController.text;
       lendedModel.totalPayment = lendTotalpaymentController.text;
+      lendedModel.rentPeriod = "${fdateFrom} to ${fdateTo}";
+      lendedModel.rentPeriodFrom = fdateFrom;
+      lendedModel.rentPeriodTo = fdateTo;
+      lendedModel.rentCountDown = rentCountDown;
 
       // updating rent-items/itemQuantity
       await firebaseFirestore
@@ -433,6 +439,10 @@ class _ItemDetailsState extends State<ItemDetails> {
           .collection("lend-items")
           .add(lendedModel.toMap())
           .then((value) {
+        FirebaseFirestore.instance
+            .collection("lend-items")
+            .doc(value.id)
+            .update({'id': value.id});
         Navigator.push(
             (context),
             MaterialPageRoute(

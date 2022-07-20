@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/screens/hero_image.dart';
-
+import 'package:http/http.dart' as http;
+import '../model/notifications_model.dart';
 import '../widgets/info_card.dart';
 
 class VerifiedUserDetails extends StatefulWidget {
@@ -16,6 +20,50 @@ class VerifiedUserDetails extends StatefulWidget {
 }
 
 class _VerifiedUserDetailsState extends State<VerifiedUserDetails> {
+  String? nToken;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getFirebaseToken();
+  }
+
+  void getFirebaseToken() async {
+    DocumentSnapshot snap = await FirebaseFirestore.instance
+        .collection("users")
+        .doc(widget.uid)
+        .get();
+    String token = snap['nToken'];
+    nToken = token;
+    print(token);
+  }
+
+  void sendPushMessage(String token, String body, String title) async {
+    try {
+      await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization':
+                'key=AAAARiLOifY:APA91bHzJcIGhL3JSn7HL03yOUS1m-oIH6vvLG1uEr9rBfpacTyH9ldYR5RmhrlioIXNZQ74JTxav8kzrw7gJNCwF6tV5AzLQe-h3wl5MBH9LMOhip7TfXRCClsD_oN8j5mh9rv8cE35',
+          },
+          body: jsonEncode(
+            <String, dynamic>{
+              'notification': <String, dynamic>{'body': body, 'title': title},
+              'priority': 'high',
+              'data': <String, dynamic>{
+                'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+                'id': '1',
+                'status': 'done'
+              },
+              'to': token,
+            },
+          ));
+    } catch (e) {
+      print('error push notification ${e}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // get selfie image url
@@ -158,21 +206,40 @@ class _VerifiedUserDetailsState extends State<VerifiedUserDetails> {
                             width: 350,
                             child: userValidId,
                           ),
-                          // MaterialButton(
-                          //   color: HexColor("#E4B43D"),
-                          //   onPressed: () {
-                          //     FirebaseFirestore firebaseFirestore =
-                          //         FirebaseFirestore.instance;
+                          MaterialButton(
+                            color: HexColor("#E4B43D"),
+                            onPressed: () async {
+                              String title = "Account Block!";
+                              String body =
+                                  "Your account has been block! you cannot login your account. Thank you";
 
-                          //     firebaseFirestore
-                          //         .collection("users")
-                          //         .doc(snapshot.data!.docChanges[0].doc['uid'])
-                          //         .update({"isUserGranted": "1"});
-                          //     Fluttertoast.showToast(msg: "Success!");
-                          //     Navigator.of(context).pop();
-                          //   },
-                          //   child: const Text("Verify User"),
-                          // )
+                              sendPushMessage(nToken!, body, title);
+
+                              FirebaseFirestore firebaseFirestore =
+                                  FirebaseFirestore.instance;
+
+                              User? user = FirebaseAuth.instance.currentUser;
+                              NotificationModel notifModel =
+                                  NotificationModel();
+                              // writing all values
+                              notifModel.title = title;
+                              notifModel.body = body;
+                              notifModel.from = user!.uid;
+                              notifModel.to = widget.uid;
+
+                              await firebaseFirestore
+                                  .collection("notifications")
+                                  .add(notifModel.toMap());
+
+                              await firebaseFirestore
+                                  .collection("users")
+                                  .doc(snapshot.data!.docChanges[0].doc['uid'])
+                                  .update({"isUserGranted": "0"});
+                              Fluttertoast.showToast(msg: "Success!");
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text("Block User"),
+                          ),
                           const SizedBox(
                             height: 50,
                           )

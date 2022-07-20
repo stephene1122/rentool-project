@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/model/chatted_friend_model.dart';
@@ -119,9 +120,9 @@ class _chatpageState extends State<chatpage> {
           onPressed: () {
             Navigator.push(
                 context,
-                MaterialPageRoute(
+                CupertinoPageRoute(
                     builder: (context) => HomeScreen(
-                          tabIndex: 2,
+                          tabIndex: 1,
                         )));
           },
         ),
@@ -203,19 +204,19 @@ class _chatpageState extends State<chatpage> {
                         'isSeen': false
                       });
                       // adding chat friend list
-                      if (widget.friendUid != friendedUID) {
-                        fs
-                            .collection("users")
-                            .doc(_auth.currentUser!.uid)
-                            .collection("chatted-friend")
-                            .add({
-                          "uid": widget.friendUid,
-                          "friend-chat-name": getUser.fullName,
-                          "friend-chat-contact": getUser.contactNumber,
-                          "friend-chat-email": getUser.emailAddress,
-                          "dateCreated": DateTime.now(),
-                        }).then((value) {});
-                      }
+                      // if (widget.friendUid != friendedUID) {
+                      //   fs
+                      //       .collection("users")
+                      //       .doc(_auth.currentUser!.uid)
+                      //       .collection("chatted-friend")
+                      //       .add({
+                      //     "uid": widget.friendUid,
+                      //     "friend-chat-name": getUser.fullName,
+                      //     "friend-chat-contact": getUser.contactNumber,
+                      //     "friend-chat-email": getUser.emailAddress,
+                      //     "dateCreated": DateTime.now(),
+                      //   }).then((value) {});
+                      // }
                       message.clear();
                     }
                   },

@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:rentool/model/notifications_model.dart';
+import 'package:http/http.dart' as http;
 
-import '../services/user_admin.dart';
 import '../widgets/info_card.dart';
 import 'hero_image.dart';
 
@@ -16,6 +20,51 @@ class UserValidationDetails extends StatefulWidget {
 }
 
 class _UserValidationDetailsState extends State<UserValidationDetails> {
+  String? nToken;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getFirebaseToken();
+  }
+
+  void getFirebaseToken() async {
+    DocumentSnapshot snap = await FirebaseFirestore.instance
+        .collection("users")
+        .doc(widget.uid)
+        .get();
+    String token = snap['nToken'];
+    nToken = token;
+    print(token);
+  }
+
+  void sendPushMessage(String token, String body, String title) async {
+    try {
+      await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization':
+                'key=AAAARiLOifY:APA91bHzJcIGhL3JSn7HL03yOUS1m-oIH6vvLG1uEr9rBfpacTyH9ldYR5RmhrlioIXNZQ74JTxav8kzrw7gJNCwF6tV5AzLQe-h3wl5MBH9LMOhip7TfXRCClsD_oN8j5mh9rv8cE35',
+          },
+          body: jsonEncode(
+            <String, dynamic>{
+              'notification': <String, dynamic>{'body': body, 'title': title},
+              'priority': 'high',
+              'data': <String, dynamic>{
+                'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+                'id': '1',
+                'status': 'done'
+              },
+              'to': token,
+            },
+          ));
+    } catch (e) {
+      print('error push notification ${e}');
+    }
+  }
+
+  final _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     // get selfie image url
@@ -158,11 +207,30 @@ class _UserValidationDetailsState extends State<UserValidationDetails> {
                           ),
                           MaterialButton(
                             color: HexColor("#E4B43D"),
-                            onPressed: () {
+                            onPressed: () async {
+                              String title = "Account Validated!";
+                              String body =
+                                  "Your account has been validated! you can now login your account. Thank you";
+
+                              sendPushMessage(nToken!, body, title);
+
                               FirebaseFirestore firebaseFirestore =
                                   FirebaseFirestore.instance;
 
-                              firebaseFirestore
+                              User? user = _auth.currentUser;
+                              NotificationModel notifModel =
+                                  NotificationModel();
+                              // writing all values
+                              notifModel.title = title;
+                              notifModel.body = body;
+                              notifModel.from = user!.uid;
+                              notifModel.to = widget.uid;
+
+                              await firebaseFirestore
+                                  .collection("notifications")
+                                  .add(notifModel.toMap());
+
+                              await firebaseFirestore
                                   .collection("users")
                                   .doc(snapshot.data!.docChanges[0].doc['uid'])
                                   .update({"isUserGranted": "1"});

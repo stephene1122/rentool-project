@@ -133,62 +133,143 @@ class _LendItemsScreenState extends State<LendItemsScreen> {
                 child: ListView.builder(
                   itemCount: snapshot.data!.docs.length,
                   itemBuilder: (_, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => ItemDetails(
-                                      refId: snapshot.data!.docChanges[index]
-                                          .doc.reference.id,
-                                    )));
-                        print(
-                            "${snapshot.data!.docChanges[index].doc.reference.id}");
-                      },
-                      child: Column(
-                        children: [
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 3, right: 3),
-                            child: ListTile(
-                                tileColor: HexColor("#E3B13B"),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(3),
-                                    side:
-                                        BorderSide(color: HexColor("#C35E12"))),
-                                title: Text(
-                                  "${snapshot.data!.docChanges[index].doc['itemName']}",
-                                  style: const TextStyle(fontSize: 20),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                    return (snapshot
+                                .data!.docChanges[index].doc['itemQuantity'] ==
+                            "0")
+                        ? GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) => const AlertDialog(
+                                        backgroundColor: Colors.red,
+                                        contentPadding:
+                                            EdgeInsets.fromLTRB(20, 23, 20, 23),
+                                        title: Center(
+                                            child: Text(
+                                          "Alert!",
+                                          style: TextStyle(color: Colors.white),
+                                        )),
+                                        content: Text(
+                                            "    This item has been wipe out!",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            )),
+                                      ));
+                            },
+                            child: Column(
+                              children: [
+                                const SizedBox(
+                                  height: 20,
                                 ),
-                                leading: _imageItem(
-                                  refId: snapshot
-                                      .data!.docChanges[index].doc.reference.id,
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 3, right: 3),
+                                  child: ListTile(
+                                      tileColor: HexColor("#E3B13B"),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(3),
+                                          side: BorderSide(
+                                              color: HexColor("#C35E12"))),
+                                      title: Text(
+                                        "${snapshot.data!.docChanges[index].doc['itemName']}",
+                                        style: const TextStyle(fontSize: 20),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      leading: _imageItem(
+                                        refId: snapshot.data!.docChanges[index]
+                                            .doc.reference.id,
+                                      ),
+                                      subtitle: Text(
+                                        "${snapshot.data!.docChanges[index].doc['itemDescription']}",
+                                        style: const TextStyle(fontSize: 16),
+                                        maxLines: 4,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 12, horizontal: 16),
+                                      trailing: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "Price: ${snapshot.data!.docChanges[index].doc['itemPrice']} \n\nQuantity: ${snapshot.data!.docChanges[index].doc['itemQuantity']}",
+                                            style:
+                                                const TextStyle(fontSize: 15),
+                                          )
+                                        ],
+                                      )),
                                 ),
-                                subtitle: Text(
-                                  "${snapshot.data!.docChanges[index].doc['itemDescription']}",
-                                  style: const TextStyle(fontSize: 16),
-                                  maxLines: 4,
-                                  overflow: TextOverflow.ellipsis,
+                              ],
+                            ),
+                          )
+                        : GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => ItemDetails(
+                                            refId: snapshot
+                                                .data!
+                                                .docChanges[index]
+                                                .doc
+                                                .reference
+                                                .id,
+                                          )));
+                              print(
+                                  "${snapshot.data!.docChanges[index].doc.reference.id}");
+                            },
+                            child: Column(
+                              children: [
+                                const SizedBox(
+                                  height: 20,
                                 ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 12, horizontal: 16),
-                                trailing: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Price: ${snapshot.data!.docChanges[index].doc['itemPrice']} \n\nQuantity: ${snapshot.data!.docChanges[index].doc['itemQuantity']}",
-                                      style: const TextStyle(fontSize: 15),
-                                    )
-                                  ],
-                                )),
-                          ),
-                        ],
-                      ),
-                    );
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 3, right: 3),
+                                  child: ListTile(
+                                      tileColor: HexColor("#E3B13B"),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(3),
+                                          side: BorderSide(
+                                              color: HexColor("#C35E12"))),
+                                      title: Text(
+                                        "${snapshot.data!.docChanges[index].doc['itemName']}",
+                                        style: const TextStyle(fontSize: 20),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      leading: _imageItem(
+                                        refId: snapshot.data!.docChanges[index]
+                                            .doc.reference.id,
+                                      ),
+                                      subtitle: Text(
+                                        "${snapshot.data!.docChanges[index].doc['itemDescription']}",
+                                        style: const TextStyle(fontSize: 16),
+                                        maxLines: 4,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 12, horizontal: 16),
+                                      trailing: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "Price: ${snapshot.data!.docChanges[index].doc['itemPrice']} \n\nQuantity: ${snapshot.data!.docChanges[index].doc['itemQuantity']}",
+                                            style:
+                                                const TextStyle(fontSize: 15),
+                                          )
+                                        ],
+                                      )),
+                                ),
+                              ],
+                            ),
+                          );
                   },
                 ),
               ),

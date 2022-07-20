@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -5,10 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/model/lend_items_model.dart';
-import 'package:rentool/model/rent_items_model.dart';
 import 'package:rentool/model/user_model.dart';
 import 'package:rentool/rent_items/contact_lender.dart';
 import '../buildmaterialcolor.dart';
+import '../model/notifications_model.dart';
+import '../services/check_token_notification.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class PlaceRentDetails extends StatefulWidget {
   PlaceRentDetails(
@@ -64,6 +69,52 @@ class _PlaceRentDetailsState extends State<PlaceRentDetails> {
       });
     });
     lendItemPaymentMethodController.text = "COD / Cash on delivery";
+
+    getFirebaseToken();
+    NotificationToken().getAdminToken().then((QuerySnapshot d) {
+      aToken = d.docs[0]['nToken'];
+      aUid = d.docs[0]['uid'];
+      print(aToken);
+      print(aUid);
+    });
+  }
+
+  String? nToken;
+  String? aToken;
+  String? aUid;
+
+  void getFirebaseToken() async {
+    DocumentSnapshot snap = await FirebaseFirestore.instance
+        .collection("users")
+        .doc(widget.lenderUid)
+        .get();
+    nToken = snap['nToken'];
+    print(nToken);
+  }
+
+  void sendPushMessage(String token, String body, String title) async {
+    try {
+      await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization':
+                'key=AAAARiLOifY:APA91bHzJcIGhL3JSn7HL03yOUS1m-oIH6vvLG1uEr9rBfpacTyH9ldYR5RmhrlioIXNZQ74JTxav8kzrw7gJNCwF6tV5AzLQe-h3wl5MBH9LMOhip7TfXRCClsD_oN8j5mh9rv8cE35',
+          },
+          body: jsonEncode(
+            <String, dynamic>{
+              'notification': <String, dynamic>{'body': body, 'title': title},
+              'priority': 'high',
+              'data': <String, dynamic>{
+                'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+                'id': '1',
+                'status': 'done'
+              },
+              'to': token,
+            },
+          ));
+    } catch (e) {
+      print('error push notification ${e}');
+    }
   }
 
   @override
@@ -178,7 +229,7 @@ class _PlaceRentDetailsState extends State<PlaceRentDetails> {
                               children: [
                                 TextFormField(
                                   controller: lendItemDeliveryAddressController,
-                                  keyboardType: TextInputType.number,
+                                  keyboardType: TextInputType.name,
                                   textInputAction: TextInputAction.next,
                                   textAlign: TextAlign.center,
                                   validator: (value) {
@@ -206,7 +257,7 @@ class _PlaceRentDetailsState extends State<PlaceRentDetails> {
                                 TextFormField(
                                   maxLines: 7,
                                   controller: lendItemMessageLenderController,
-                                  keyboardType: TextInputType.number,
+                                  keyboardType: TextInputType.name,
                                   textInputAction: TextInputAction.done,
                                   textAlign: TextAlign.center,
                                   decoration: InputDecoration(
@@ -308,7 +359,11 @@ class _PlaceRentDetailsState extends State<PlaceRentDetails> {
                                       padding: const EdgeInsets.fromLTRB(
                                           20, 5, 20, 5),
                                       minWidth: 350,
-                                      onPressed: () {
+                                      onPressed: () async {
+                                        String title =
+                                            "Congrats, you have a borrower";
+                                        String body =
+                                            "User wants to borrow your item";
                                         if (lendItemDeliveryAddressController
                                                 .text ==
                                             "") {
@@ -336,7 +391,38 @@ class _PlaceRentDetailsState extends State<PlaceRentDetails> {
                                           postLendedItem(
                                               lenderDetails.uid,
                                               lenderDetails.emailAddress,
-                                              lenderDetails.fullName);
+                                              lenderDetails.fullName,
+                                              widget.refId);
+
+                                          sendPushMessage(nToken!, body, title);
+
+                                          FirebaseFirestore firebaseFirestore =
+                                              FirebaseFirestore.instance;
+
+                                          User? user =
+                                              FirebaseAuth.instance.currentUser;
+
+                                          NotificationModel notifModel =
+                                              NotificationModel();
+                                          // writing all values
+                                          notifModel.title = title;
+                                          notifModel.body = body;
+                                          notifModel.from = user!.uid;
+                                          notifModel.to = widget.lenderUid;
+
+                                          await firebaseFirestore
+                                              .collection("notifications")
+                                              .add(notifModel.toMap())
+                                              .then((value) {
+                                            FirebaseFirestore.instance
+                                                .collection("notifications")
+                                                .doc(value.id)
+                                                .update({
+                                              'id': value.id,
+                                              'typeId': 4,
+                                              'lend-item-id': widget.refId
+                                            });
+                                          });
                                         }
                                       },
                                       child: const Text(
@@ -364,7 +450,8 @@ class _PlaceRentDetailsState extends State<PlaceRentDetails> {
     );
   }
 
-  void postLendedItem(String? uid, String? email, String? name) async {
+  void postLendedItem(
+      String? uid, String? email, String? name, String? refId) async {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
     LendItemModel lendedModel = LendItemModel();
@@ -381,12 +468,14 @@ class _PlaceRentDetailsState extends State<PlaceRentDetails> {
       "deliveryAddress": lendItemDeliveryAddressController.text,
       "lendMessage": lendItemMessageLenderController.text,
       "paymentMethod": lendItemPaymentMethodController.text,
+      "status": "pending",
     });
     Fluttertoast.showToast(msg: "created");
     Navigator.push(
         (context),
         MaterialPageRoute(
             builder: (context) => ContactLender(
+                  refId: refId!,
                   lenderUid: uid,
                   lenderEmail: email,
                   lenderName: name,

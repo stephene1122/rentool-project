@@ -2,9 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/borrow_items/borrow_item_details.dart';
+import 'package:rentool/buildmaterialcolor.dart';
 import 'package:rentool/rent_items/add_rent.dart';
 import 'package:rentool/screens/home_screen.dart';
 import 'package:rentool/screens/lend_items_screen.dart';
+
+import '../screens/hero_image.dart';
 
 class BorrowItemsList extends StatefulWidget {
   BorrowItemsList({Key? key, required this.userId}) : super(key: key);
@@ -16,20 +19,30 @@ class BorrowItemsList extends StatefulWidget {
 class _BorrowItemsListState extends State<BorrowItemsList> {
   @override
   Widget build(BuildContext context) {
-    var rentItemDetails;
-    Future<void> getItemDetails(refId) async {
-      //query the rent item
-      await FirebaseFirestore.instance
+    String itemName, itemPrice, itemDescription;
+    // get selfie image url
+    final userImage = StreamBuilder(
+      stream: FirebaseFirestore.instance
           .collection("rent-items")
-          .doc(refId)
-          .snapshots()
-          .listen((event) {
-        setState(() {
-          rentItemDetails = event.get("itemName");
-          print(rentItemDetails);
-        });
-      });
-    }
+          .doc()
+          .collection("images")
+          .snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) {
+          return SizedBox(
+              height: 80,
+              width: 80,
+              child: Image.asset("assets/square-image.png"));
+        } else {
+          return ListView.builder(
+              itemCount: snapshot.data!.docs.length,
+              itemBuilder: (BuildContext context, int index) {
+                String url = snapshot.data!.docs[index]["downloadURL"];
+                return Text(url);
+              });
+        }
+      },
+    );
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
@@ -43,11 +56,12 @@ class _BorrowItemsListState extends State<BorrowItemsList> {
         },
         child: const Icon(Icons.add),
       ),
-      appBar: AppBar(title: const Text("Borrowed Items")),
+      appBar: AppBar(title: const Text("Your Borrowed Items")),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection("lend-items")
-            .where("uid", isEqualTo: "${widget.userId}")
+            .where("uid", isEqualTo: widget.userId)
+            .where("status", isEqualTo: "accepted")
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
@@ -71,17 +85,47 @@ class _BorrowItemsListState extends State<BorrowItemsList> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => BorrowitemDetails(
-                                borrowRefId: snapshot
-                                    .data!.docChanges[index].doc['itemId'])));
-                    print(snapshot.data!.docChanges[index].doc['itemId']);
+                                  rentItemId: snapshot
+                                      .data!.docChanges[index].doc['itemId'],
+                                  lendId: snapshot
+                                      .data!.docChanges[index].doc['id'],
+                                )));
+                    print(snapshot.data!.docChanges[index].doc['id']);
                   },
                   child: Column(
                     children: [
                       const SizedBox(
                         height: 20,
                       ),
-                      getRentItemDetails(
-                          refId: snapshot.data!.docChanges[index].doc['itemId'])
+                      Padding(
+                        padding: const EdgeInsets.only(left: 3, right: 3),
+                        child: ListTile(
+                          tileColor: HexColor("#E3B13B"),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(3),
+                              side: BorderSide(color: HexColor("#C35E12"))),
+                          title: _itemName(
+                              id: snapshot
+                                  .data!.docChanges[index].doc['itemId']),
+                          leading: _imageItem(
+                              imageRefId: snapshot
+                                  .data!.docChanges[index].doc['itemId']),
+                          subtitle: _itemDescription(
+                              id: snapshot
+                                  .data!.docChanges[index].doc['itemId']),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 12, horizontal: 16),
+                          trailing: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              itemPriceQuantity(
+                                id: snapshot
+                                    .data!.docChanges[index].doc['itemId'],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 );
@@ -95,112 +139,119 @@ class _BorrowItemsListState extends State<BorrowItemsList> {
 }
 
 class _imageItem extends StatelessWidget {
-  _imageItem({Key? key, this.refId}) : super(key: key);
+  _imageItem({Key? key, required this.imageRefId}) : super(key: key);
 
-  String? refId;
+  String imageRefId;
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection("rent-items").snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection("rent-items")
+          .doc(imageRefId)
+          .collection("images")
+          .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) {
           return SizedBox(
-              height: 80,
-              width: 80,
+              height: 60,
+              width: 60,
               child: Image.asset("assets/square-album.png"));
         } else {
-          // return ListView.builder(
-          //     itemCount: snapshot.data!.docs.length,
-          //     itemBuilder: (BuildContext context, int index) {
-          //       String url = snapshot.data!.docs[index]["downloadURL"];
-          //       return GestureDetector(
-          //         onTap: () {
-          //           print("images");
-          //         },
-          //         child: CircleAvatar(
-          //           radius: 30,
-          //           backgroundImage: NetworkImage(url),
-          //         ),
-          //       );
-          //     });
           String url = snapshot.data!.docs[0]["downloadURL"];
-          return GestureDetector(
-              onTap: () {
-                print("image");
-              },
-              child: SizedBox(
-                  width: 60,
-                  height: 80,
-                  child: Image.network(
-                    url,
-                    fit: BoxFit.cover,
-                  )));
+          return SizedBox(
+            child: Image.network(
+              url,
+              fit: BoxFit.cover,
+            ),
+          );
         }
       },
     );
   }
 }
 
-class getRentItemDetails extends StatefulWidget {
-  getRentItemDetails({Key? key, required this.refId}) : super(key: key);
+class _itemName extends StatelessWidget {
+  _itemName({Key? key, required this.id}) : super(key: key);
 
-  String refId;
+  String id;
 
-  @override
-  State<getRentItemDetails> createState() => _getRentItemDetailsState();
-}
-
-class _getRentItemDetailsState extends State<getRentItemDetails> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection("rent-items")
-          .where("postID", isEqualTo: widget.refId)
+          .where('itemId', isEqualTo: id)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) {
-          return const Text("no data!");
+          return const Text("No data!");
         } else {
-          String rentItemName = snapshot.data!.docs[0]["itemName"];
-          String rentItemDescription =
-              snapshot.data!.docs[0]["itemDescription"];
-          String rentItemPrice = snapshot.data!.docs[0]['itemPrice'];
-          String rentItemQuantity = snapshot.data!.docs[0]['itemQuantity'];
-          return Padding(
-              padding: const EdgeInsets.only(left: 3, right: 3),
-              child: ListTile(
-                tileColor: HexColor("#E3B13B"),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(3),
-                    side: BorderSide(color: HexColor("#C35E12"))),
-                title: Text(rentItemName,
-                    style: const TextStyle(fontSize: 20),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis),
-                // leading: _imageItem(
-                //   refId: snapshot
-                //       .data!.docChanges[index].doc.reference.id,
-                // ),
-                subtitle: Text(
-                  rentItemDescription,
-                  style: const TextStyle(fontSize: 20),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                trailing: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      "\nPrice: ${rentItemPrice} \nQuantity: ${rentItemQuantity}",
-                      style: const TextStyle(fontSize: 15),
-                    )
-                  ],
-                ),
-              ));
+          String d = snapshot.data!.docs[0]["itemName"];
+          return Text(
+            d,
+            style: const TextStyle(fontSize: 20),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          );
+        }
+      },
+    );
+  }
+}
+
+class _itemDescription extends StatelessWidget {
+  _itemDescription({Key? key, required this.id}) : super(key: key);
+
+  String id;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection("rent-items")
+          .where('itemId', isEqualTo: id)
+          .snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) {
+          return const Text("No data!");
+        } else {
+          String d = snapshot.data!.docs[0]["itemDescription"];
+          return Text(
+            d,
+            style: const TextStyle(fontSize: 16),
+            maxLines: 4,
+            overflow: TextOverflow.ellipsis,
+          );
+        }
+      },
+    );
+  }
+}
+
+class itemPriceQuantity extends StatelessWidget {
+  itemPriceQuantity({Key? key, required this.id}) : super(key: key);
+
+  String id;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection("rent-items")
+          .where('itemId', isEqualTo: id)
+          .snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) {
+          return const Text("No data!");
+        } else {
+          String d = snapshot.data!.docs[0]["itemPrice"];
+          String e = snapshot.data!.docs[0]["itemQuantity"];
+          return Text(
+            "Price: ${d} \nQuantity: ${e}",
+            style: const TextStyle(fontSize: 16),
+            overflow: TextOverflow.ellipsis,
+          );
         }
       },
     );

@@ -382,10 +382,9 @@ class _AddRentState extends State<AddRent> {
         .collection("rent-items")
         .add(rentItemModel.toMap())
         .then((value) {
-      firebaseFirestore
-          .collection("rent-items")
-          .doc(value.id)
-          .update({'postID': value.id});
+      firebaseFirestore.collection("rent-items").doc(value.id).update({
+        'itemId': value.id,
+      });
       uploadImage(value.id);
     });
     // Fluttertoast.showToast(msg: "For rent item created successfully");

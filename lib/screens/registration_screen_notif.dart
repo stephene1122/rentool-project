@@ -1,10 +1,19 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/screens/login_screen.dart';
+import 'package:http/http.dart' as http;
+import 'package:rentool/services/check_token_notification.dart';
+
+import '../model/notifications_model.dart';
 
 class RegistrationScreenNotif extends StatefulWidget {
-  const RegistrationScreenNotif({Key? key}) : super(key: key);
+  RegistrationScreenNotif({required this.uid});
+
+  String uid;
 
   @override
   State<RegistrationScreenNotif> createState() =>
@@ -12,6 +21,58 @@ class RegistrationScreenNotif extends StatefulWidget {
 }
 
 class _RegistrationScreenNotifState extends State<RegistrationScreenNotif> {
+  String? nToken;
+  String? aToken;
+  String? aUid;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getFirebaseToken();
+    NotificationToken().getAdminToken().then((QuerySnapshot d) {
+      aToken = d.docs[0]['nToken'];
+      aUid = d.docs[0]['uid'];
+      print(aToken);
+      print(aUid);
+    });
+  }
+
+  void getFirebaseToken() async {
+    DocumentSnapshot snap = await FirebaseFirestore.instance
+        .collection("users")
+        .doc(widget.uid)
+        .get();
+    String token = snap['nToken'];
+    nToken = token;
+    print(token);
+  }
+
+  void sendPushMessage(String token, String body, String title) async {
+    try {
+      await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization':
+                'key=AAAARiLOifY:APA91bHzJcIGhL3JSn7HL03yOUS1m-oIH6vvLG1uEr9rBfpacTyH9ldYR5RmhrlioIXNZQ74JTxav8kzrw7gJNCwF6tV5AzLQe-h3wl5MBH9LMOhip7TfXRCClsD_oN8j5mh9rv8cE35',
+          },
+          body: jsonEncode(
+            <String, dynamic>{
+              'notification': <String, dynamic>{'body': body, 'title': title},
+              'priority': 'high',
+              'data': <String, dynamic>{
+                'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+                'id': '1',
+                'status': 'done'
+              },
+              'to': token,
+            },
+          ));
+    } catch (e) {
+      print('error push notification ${e}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,9 +118,28 @@ class _RegistrationScreenNotifState extends State<RegistrationScreenNotif> {
                 height: 35,
               ),
               GestureDetector(
-                onTap: () {
-                  // Navigator.push(context,
-                  //     MaterialPageRoute(builder: (context) => LoginScreen()));
+                onTap: () async {
+                  String title = "New User!";
+                  String body = "Account created! Verify the user information";
+
+                  sendPushMessage(aToken!, body, title);
+
+                  FirebaseFirestore firebaseFirestore =
+                      FirebaseFirestore.instance;
+
+                  NotificationModel notifModel = NotificationModel();
+                  // writing all values
+                  notifModel.title = title;
+                  notifModel.body = body;
+                  notifModel.from = widget.uid;
+                  notifModel.to = aUid;
+
+                  await firebaseFirestore
+                      .collection("notifications")
+                      .add(notifModel.toMap());
+
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()));
                   logout(context);
                 },
                 child: Text(

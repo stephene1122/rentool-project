@@ -60,22 +60,12 @@ class _PeopleState extends State<People> {
         leading: SafeArea(
           child: IconButton(
               onPressed: () {
-                Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => HomeScreen(tabIndex: 1)))
-                    .then((value) {
-                  setState(() {});
-                });
+                Navigator.pop(context);
               },
               icon: const Icon(
                 Icons.arrow_back,
                 color: Colors.black,
               )),
-        ),
-        title: const Text(
-          "People",
-          style: TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -157,7 +147,7 @@ class _PeopleState extends State<People> {
                               right: 3,
                             ),
                             child: ListTile(
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                   vertical: 8, horizontal: 6),
                               tileColor: HexColor("#E3B13B"),
                               shape: RoundedRectangleBorder(

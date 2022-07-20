@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rentool/buildmaterialcolor.dart';
@@ -8,6 +9,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/imageupload/registration_upload_validid.dart';
 import 'package:rentool/model/user_model.dart';
 import 'package:intl/intl.dart';
+import 'package:rentool/services/check_token_notification.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
@@ -17,6 +19,22 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getToken();
+  }
+
+  void getToken() async {
+    await FirebaseMessaging.instance.getToken().then((token) {
+      setState(() {
+        mtoken = token;
+      });
+      // saveToken(token!);
+    });
+  }
+
   final _auth = FirebaseAuth.instance;
 
   // our form key
@@ -30,6 +48,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final emailAddressEditingController = new TextEditingController();
   final passwordEditingController = new TextEditingController();
   final confirmPasswordEditingController = new TextEditingController();
+
+  String? mtoken;
+  String? ctoken;
 
   // show date picker and format date
   Future _selectDate() async {
@@ -331,6 +352,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: MediaQuery.of(context).size.width,
           onPressed: () {
+            NotificationToken().checkToken(mtoken!).then((QuerySnapshot d) {
+              String token = d.docs[0]['nToken'];
+              ctoken = token;
+              if (token.isNotEmpty) {
+                Fluttertoast.showToast(
+                    msg: "This device already have an account.");
+              }
+            });
             singnUpFunction(emailAddressEditingController.text,
                 passwordEditingController.text);
           },
@@ -450,12 +479,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     userModel.gender = genderEditingController.text;
     userModel.homeAddress = homeAddressEditingController.text;
     userModel.contactNumber = contactNumberEditingController.text;
+    userModel.nToken = mtoken;
 
     await firebaseFirestore
         .collection("users")
         .doc(user.uid)
         .set(userModel.toMap());
-    Fluttertoast.showToast(msg: "Account created successfully");
+    // Fluttertoast.showToast(msg: "Account created successfully");
     Navigator.pushAndRemoveUntil(
         (context),
         MaterialPageRoute(

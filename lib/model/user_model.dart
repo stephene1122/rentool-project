@@ -8,6 +8,7 @@ class UserModel {
   String? emailAddress;
   String? isAdmin;
   String? isUserGranted;
+  String? nToken;
 
   UserModel(
       {this.uid,
@@ -18,21 +19,22 @@ class UserModel {
       this.contactNumber,
       this.emailAddress,
       this.isAdmin,
-      this.isUserGranted});
+      this.isUserGranted,
+      this.nToken});
 
   // taking data from server
   factory UserModel.fromMap(map) {
     return UserModel(
-      uid: map['uid'],
-      fullName: map['fullName'],
-      birthDate: map['birthDate'],
-      gender: map['gender'],
-      homeAddress: map['homeAddress'],
-      contactNumber: map['contactNumber'],
-      emailAddress: map['emailAddress'],
-      isAdmin: map['isAdmin'],
-      isUserGranted: map['isUserGranted'],
-    );
+        uid: map['uid'],
+        fullName: map['fullName'],
+        birthDate: map['birthDate'],
+        gender: map['gender'],
+        homeAddress: map['homeAddress'],
+        contactNumber: map['contactNumber'],
+        emailAddress: map['emailAddress'],
+        isAdmin: map['isAdmin'],
+        isUserGranted: map['isUserGranted'],
+        nToken: map['nToken']);
   }
 
   // sending data from server
@@ -47,7 +49,8 @@ class UserModel {
       'emailAddress': emailAddress,
       'isUserGranted': '0',
       'isAdmin': '0',
-      'dateCreated': DateTime.now()
+      'nToken': nToken,
+      'dateCreated': DateTime.now(),
     };
   }
 }
