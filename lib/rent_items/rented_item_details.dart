@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,45 +9,33 @@ import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:rentool/borrow_items/borrow_item_list.dart';
 import 'package:rentool/buildmaterialcolor.dart';
 import 'package:rentool/chat/chatpage.dart';
 import 'package:rentool/model/lend_items_model.dart';
-import 'package:rentool/model/notifications_model.dart';
 import 'package:rentool/model/rent_items_model.dart';
 import 'package:rentool/model/user_model.dart';
+import 'package:rentool/rent_items/rent_list.dart';
 import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
 
-import '../services/check_token_notification.dart';
-
-class BorrowitemDetails extends StatefulWidget {
-  BorrowitemDetails(
-      {Key? key,
-      required this.rentItemId,
-      required this.lendId,
-      this.lenderUid})
+class RentedItemDetails extends StatefulWidget {
+  RentedItemDetails({Key? key, required this.rentItemId, required this.lendId})
       : super(key: key);
 
   String rentItemId;
   String lendId;
-  String? lenderUid;
 
   @override
-  State<BorrowitemDetails> createState() => _BorrowitemDetailsState();
+  State<RentedItemDetails> createState() => _RentedItemDetailsState();
 }
 
-class _BorrowitemDetailsState extends State<BorrowitemDetails> {
+class _RentedItemDetailsState extends State<RentedItemDetails> {
   double rating = 0;
-  String? nToken;
   final _formKey = GlobalKey<FormState>();
 
   final _auth = FirebaseAuth.instance;
   RentItemModel rentItemDetails = RentItemModel();
   LendItemModel lendItemDetails = LendItemModel();
   UserModel lenderDetails = UserModel();
-  FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-  NotificationModel notifModel = NotificationModel();
 
   TextEditingController itemNameController = TextEditingController();
   TextEditingController itemDescriptionController = TextEditingController();
@@ -155,18 +142,6 @@ class _BorrowitemDetailsState extends State<BorrowitemDetails> {
                     style: TextStyle(fontSize: 20),
                   ),
                   onPressed: () async {
-                    var cRating = num.parse(rentItemDetails.ratings!);
-                    var computeRating = cRating + rating;
-
-                    // adding total ratings
-                    await FirebaseFirestore.instance
-                        .collection("rent-items")
-                        .doc(lendItemDetails.itemId)
-                        .update(
-                      {
-                        "ratings": computeRating.toString(),
-                      },
-                    );
                     // adding item rate
                     await FirebaseFirestore.instance
                         .collection("rent-items")
@@ -188,14 +163,26 @@ class _BorrowitemDetailsState extends State<BorrowitemDetails> {
                           "id": value.id,
                         },
                       );
-                      // Navigation
-                      Navigator.of(context, rootNavigator: false)
-                          .pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (context) => BorrowItemsList(
-                                      userId: _auth.currentUser!.uid)),
-                              (route) => route.isFirst);
                     });
+                    // creating notification for the lender
+                    await FirebaseFirestore.instance
+                        .collection("notifications")
+                        .add({
+                      "title": "Return Item",
+                      "body": "Get your item from the borrower",
+                      "from": _auth.currentUser!.uid.toString(),
+                      "to": rentItemDetails.uid.toString(),
+                      "lend-item-id": lendItemDetails.id.toString(),
+                      "typeId": 6
+                    }).then(
+                      (value) async {
+                        await FirebaseFirestore.instance
+                            .collection("notifications")
+                            .doc(value.id)
+                            .update({"id": value.id.toString()});
+                        Navigator.pop(context);
+                      },
+                    );
                   }),
             ]),
       );
@@ -204,10 +191,6 @@ class _BorrowitemDetailsState extends State<BorrowitemDetails> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // get user nToken
-    getFirebaseToken();
-    print("lenderUid: ${widget.lenderUid}");
-
     FirebaseFirestore.instance
         .collection("rent-items")
         .doc(widget.rentItemId)
@@ -264,41 +247,6 @@ class _BorrowitemDetailsState extends State<BorrowitemDetails> {
     });
   }
 
-  void getFirebaseToken() async {
-    DocumentSnapshot snap = await FirebaseFirestore.instance
-        .collection("users")
-        .doc(widget.lenderUid)
-        .get();
-    String token = snap['nToken'];
-    nToken = token;
-    print("nToken: ${nToken}");
-  }
-
-  void sendPushMessage(String body, String title) async {
-    try {
-      await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
-          headers: <String, String>{
-            'Content-Type': 'application/json',
-            'Authorization':
-                'key=AAAARiLOifY:APA91bHzJcIGhL3JSn7HL03yOUS1m-oIH6vvLG1uEr9rBfpacTyH9ldYR5RmhrlioIXNZQ74JTxav8kzrw7gJNCwF6tV5AzLQe-h3wl5MBH9LMOhip7TfXRCClsD_oN8j5mh9rv8cE35',
-          },
-          body: jsonEncode(
-            <String, dynamic>{
-              'notification': <String, dynamic>{'body': body, 'title': title},
-              'priority': 'high',
-              'data': <String, dynamic>{
-                'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-                'id': '1',
-                'status': 'done'
-              },
-              'to': nToken,
-            },
-          ));
-    } catch (e) {
-      print('error push notification ${e}');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     void updateDateExpire(int xday) async {
@@ -315,58 +263,6 @@ class _BorrowitemDetailsState extends State<BorrowitemDetails> {
         "rentPeriodTo": "${extendedDate}",
         "rentCountDown": "${extendedDate}",
         "rentPeriod": "${dateFromFormat} to ${dateToFormat}",
-      });
-    }
-
-    void borrowerExtendNotification(int xday) async {
-      print(nToken);
-
-      String title = "Rent Extended!";
-      String body = "Borrower extended the rent by ${xday} day.";
-      // send notification on phone
-      sendPushMessage(body, title);
-
-      // writing all values
-      notifModel.title = title;
-      notifModel.body = body;
-      notifModel.from = lendItemDetails.uid;
-      notifModel.to = lendItemDetails.lenderUid;
-      notifModel.typeId = 7;
-      notifModel.dateCreated = DateTime.now();
-
-      await firebaseFirestore
-          .collection("notifications")
-          .add(notifModel.toMap());
-    }
-
-    void borrowerReturnItemNotification() async {
-      String title = "Returning Item";
-      String body = "Borrower wants to return the item";
-
-      sendPushMessage(body, title);
-
-      //writing all values
-      // notifModel.title = title;
-      // notifModel.body = body;
-      // notifModel.from = lendItemDetails.uid;
-      // notifModel.to = lendItemDetails.lenderUid;
-      // notifModel.lend-item-id =
-      // notifModel.typeId = 6;
-      // notifModel.dateCreated = DateTime.now();
-
-      await firebaseFirestore.collection("notifications").add({
-        "title": title,
-        "body": body,
-        "from": lendItemDetails.uid,
-        "to": lendItemDetails.lenderUid,
-        "lend-item-id": lendItemDetails.id,
-        "dateCreated": DateTime.now(),
-        "typeId": 6
-      }).then((value) async {
-        await FirebaseFirestore.instance
-            .collection("notifications")
-            .doc(value.id)
-            .update({"id": value.id});
       });
     }
 
@@ -571,7 +467,6 @@ class _BorrowitemDetailsState extends State<BorrowitemDetails> {
             ),
             labelText: "Rent Period",
             labelStyle: const TextStyle(fontSize: 20)));
-
     // item quantity field
     final shippingPaymentField = TextFormField(
         readOnly: true,
@@ -705,7 +600,7 @@ class _BorrowitemDetailsState extends State<BorrowitemDetails> {
                               //     int.parse(lendItemDetails.lendItemQuantity!);
                               // var cRentItemQuantity =
                               //     int.parse(rentItemDetails.itemQuantity!);
-                              // int com = lendedItemQuantity + cRentItemQuantity;
+                              // var com = lendedItemQuantity + cRentItemQuantity;
                               // await FirebaseFirestore.instance
                               //     .collection("rent-items")
                               //     .doc(lendItemDetails.itemId)
@@ -718,10 +613,6 @@ class _BorrowitemDetailsState extends State<BorrowitemDetails> {
                                   .collection("lend-items")
                                   .doc(lendItemDetails.id)
                                   .update({"status": "expired"});
-
-                              // notification for the lender
-                              borrowerReturnItemNotification();
-
                               Navigator.pop(context);
                               showRating();
                             },
@@ -801,8 +692,7 @@ class _BorrowitemDetailsState extends State<BorrowitemDetails> {
                                       });
                                       // update day return date of the item
                                       updateDateExpire(extendDay);
-                                      // send notification to lender for rent extended by borrower
-                                      borrowerExtendNotification(addDay);
+
                                       Navigator.pop(context);
                                       // new alert
                                       setState(() {
@@ -831,13 +721,6 @@ class _BorrowitemDetailsState extends State<BorrowitemDetails> {
                                                                               child: const Text("Ok")),
                                                                         ],
                                                                       ));
-                                                          Navigator.pushReplacement(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                  builder: (BuildContext
-                                                                          context) =>
-                                                                      super
-                                                                          .widget));
                                                         },
                                                         child:
                                                             const Text("Ok")),
@@ -870,8 +753,7 @@ class _BorrowitemDetailsState extends State<BorrowitemDetails> {
                                       });
                                       // update day return date of the item
                                       updateDateExpire(extendDay);
-                                      // send notification to lender for rent extended by borrower
-                                      borrowerExtendNotification(addDay);
+
                                       Navigator.pop(context);
                                       // new alert
                                       setState(() {
@@ -905,12 +787,6 @@ class _BorrowitemDetailsState extends State<BorrowitemDetails> {
                                                             const Text("Ok")),
                                                   ],
                                                 ));
-                                        Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder:
-                                                    (BuildContext context) =>
-                                                        super.widget));
                                       });
                                     }
                                   },
@@ -971,7 +847,7 @@ class _BorrowitemDetailsState extends State<BorrowitemDetails> {
         backgroundColor: Colors.white,
         appBar: AppBar(
           title: const Text(
-            "Borrowed Item Details",
+            "Lended Item Details",
           ),
           leading: IconButton(
               icon: const Icon(
@@ -1080,78 +956,6 @@ class _BorrowitemDetailsState extends State<BorrowitemDetails> {
                         const SizedBox(
                           height: 40,
                         ),
-                        (lendItemDetails.extendedDay != "0")
-                            ? Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  const Text(
-                                    "Extended Rent Payment",
-                                    style: TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    "Service fee: ₱${lendItemDetails.serviceFee}",
-                                    style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w400),
-                                  ),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    "Additional Day: ${lendItemDetails.extendedDay} day",
-                                    style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w400),
-                                  ),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    "Item Price: ₱${rentItemDetails.itemPrice}",
-                                    style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w400),
-                                  ),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    "Total: (${rentItemDetails.itemPrice} * ${lendItemDetails.extendedDay}) + ${lendItemDetails.serviceFee} = ₱${lendItemDetails.extendPrice}",
-                                    style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w400),
-                                  ),
-                                  const SizedBox(
-                                    height: 35,
-                                  ),
-                                ],
-                              )
-                            : const Text("EXTEND RENT DURATION",
-                                style: TextStyle(
-                                    fontSize: 22, fontWeight: FontWeight.w400)),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        SizedBox(
-                          width: 265,
-                          child: extendRentDayField,
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        extendRentDayBtn,
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        returnItem,
-                        const SizedBox(
-                          height: 15,
-                        ),
                         contactLender
                       ],
                     )),
@@ -1178,8 +982,8 @@ class _imageItem extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) {
           return SizedBox(
-              height: 60,
-              width: 60,
+              height: 80,
+              width: 80,
               child: Image.asset("assets/square-album.png"));
         } else {
           // return ListView.builder(

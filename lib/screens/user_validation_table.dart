@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -61,80 +60,84 @@ class _NewUsersTableState extends State<NewUsersTable> {
         appBar: AppBar(
           title: const Text("New Registered Users"),
         ),
-        body: StreamBuilder(
-          stream: FirebaseFirestore.instance
-              .collection("users")
-              .where('isUserGranted', isEqualTo: '0')
-              .snapshots(),
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (snapshot.hasError) {
-              return const Text("something wrong");
-            }
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            return ListView.builder(
-                itemCount: snapshot.data!.docs.length,
-                itemBuilder: (_, index) {
-                  return SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: ListTile(
-                        onLongPress: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => UserValidationDetails(
-                                  uid: snapshot
-                                      .data!.docChanges[index].doc['uid'],
-                                ),
-                              ));
-                        },
-                        leading: _userImage(
-                            uid: snapshot.data!.docChanges[index].doc['uid']),
-                        title: Text(
-                            "${snapshot.data!.docChanges[index].doc['fullName']}"),
-                        subtitle: Text(
-                            "${snapshot.data!.docChanges[index].doc['homeAddress']}"),
-                        trailing: MaterialButton(
-                          onPressed: () async {
-                            String title = "Account Validated!";
-                            String body =
-                                "Your account has been validated! you can now login your account. Thank you";
-                            String uid =
-                                snapshot.data!.docChanges[index].doc['uid'];
-                            getFirebaseToken(uid);
-                            sendPushMessage(nToken!, body, title);
-
-                            FirebaseFirestore firebaseFirestore =
-                                FirebaseFirestore.instance;
-
-                            User? user = FirebaseAuth.instance.currentUser;
-                            NotificationModel notifModel = NotificationModel();
-                            // writing all values
-                            notifModel.title = title;
-                            notifModel.body = body;
-                            notifModel.from = user!.uid;
-                            notifModel.to = uid;
-
-                            await firebaseFirestore
-                                .collection("notifications")
-                                .add(notifModel.toMap());
-
-                            userAdminService().approvedUser(
-                                "${snapshot.data!.docChanges[index].doc['uid']}",
-                                "context");
+        body: Container(
+          padding: const EdgeInsets.only(top: 10),
+          child: StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection("users")
+                .where('isUserGranted', isEqualTo: '0')
+                .snapshots(),
+            builder:
+                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.hasError) {
+                return const Text("something wrong");
+              }
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              return ListView.builder(
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (_, index) {
+                    return SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: ListTile(
+                          onLongPress: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UserValidationDetails(
+                                    uid: snapshot
+                                        .data!.docChanges[index].doc['uid'],
+                                  ),
+                                ));
                           },
-                          child: Icon(
-                            Icons.verified_user,
-                            color: HexColor("#E4B43D"),
+                          leading: _userImage(
+                              uid: snapshot.data!.docChanges[index].doc['uid']),
+                          title: Text(
+                              "${snapshot.data!.docChanges[index].doc['fullName']}"),
+                          subtitle: Text(
+                              "${snapshot.data!.docChanges[index].doc['homeAddress']}"),
+                          trailing: MaterialButton(
+                            onPressed: () async {
+                              String title = "Account Validated!";
+                              String body =
+                                  "Your account has been validated! you can now login your account. Thank you";
+                              String uid =
+                                  snapshot.data!.docChanges[index].doc['uid'];
+                              getFirebaseToken(uid);
+                              sendPushMessage(nToken!, body, title);
+
+                              FirebaseFirestore firebaseFirestore =
+                                  FirebaseFirestore.instance;
+
+                              User? user = FirebaseAuth.instance.currentUser;
+                              NotificationModel notifModel =
+                                  NotificationModel();
+                              // writing all values
+                              notifModel.title = title;
+                              notifModel.body = body;
+                              notifModel.from = user!.uid;
+                              notifModel.to = uid;
+
+                              await firebaseFirestore
+                                  .collection("notifications")
+                                  .add(notifModel.toMap());
+
+                              userAdminService().approvedUser(
+                                  "${snapshot.data!.docChanges[index].doc['uid']}",
+                                  "context");
+                            },
+                            child: Icon(
+                              Icons.verified_user,
+                              color: HexColor("#E4B43D"),
+                            ),
                           ),
-                        ),
-                      ));
-                });
-          },
+                        ));
+                  });
+            },
+          ),
         ));
   }
 }

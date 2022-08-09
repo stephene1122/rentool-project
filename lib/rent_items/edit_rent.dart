@@ -303,11 +303,15 @@ class _EditRentItemState extends State<EditRentItem> {
                                   widget.docId.reference
                                       .delete()
                                       .whenComplete(() {
-                                    Navigator.pop(
-                                        context,
-                                        new MaterialPageRoute(
-                                            builder: (context) =>
-                                                new LendedItems()));
+                                    Navigator.of(context, rootNavigator: true)
+                                        .pushAndRemoveUntil(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    LendedItems(
+                                                      userId: _auth
+                                                          .currentUser!.uid,
+                                                    )),
+                                            (route) => route.isFirst);
                                   })
                                 },
                             child: const Text("Ok"))
@@ -408,11 +412,11 @@ class _EditRentItemState extends State<EditRentItem> {
     uploadImage();
 
     await widget.docId.reference.set(rentItemModel.toMap()).whenComplete(() {
-      Navigator.pushReplacement(
-          context,
+      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
           MaterialPageRoute(
-            builder: (context) => LendedItems(),
-          ));
+              builder: (context) =>
+                  LendedItems(userId: _auth.currentUser!.uid)),
+          (route) => route.isFirst);
     });
   }
 }

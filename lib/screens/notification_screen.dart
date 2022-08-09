@@ -1,17 +1,13 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:http/http.dart' as http;
+import 'package:rentool/notifications/return_item.dart';
 import 'package:rentool/rent_items/contact_borrower.dart';
+import 'package:rentool/screens/home_screen.dart';
 import 'package:rentool/screens/transaction_granted.dart';
-
-import 'hero_image.dart';
+import 'package:rentool/screens/user_validation_table.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({Key? key}) : super(key: key);
@@ -22,6 +18,8 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   User? user = FirebaseAuth.instance.currentUser;
+
+  final db = FirebaseFirestore.instance;
 
   TextEditingController username = TextEditingController();
 
@@ -164,6 +162,23 @@ class _NotificationScreenState extends State<NotificationScreen> {
   //   }
   // }
 
+  // @override
+  // void initState() {
+  //   // TODO: implement initState
+  //   super.initState();
+  //   refresh();
+  // }
+
+  // Future refresh() async {
+  //   Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(
+  //           builder: (BuildContext context) => HomeScreen(
+  //                 tabIndex: 2,
+  //               )));
+  //   print("object");
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -192,18 +207,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
               ],
             )),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        label: const Text("Notif"),
-        onPressed: () {
-          // getToken();
-        },
-        icon: const Icon(Icons.construction_rounded),
-        backgroundColor: HexColor("#E4B43D"),
-      ),
+      // floatingActionButton: FloatingActionButton.extended(
+      //   label: const Text("Notif"),
+      //   onPressed: () {
+      //     // getToken();
+      //   },
+      //   icon: const Icon(Icons.construction_rounded),
+      //   backgroundColor: HexColor("#E4B43D"),
+      // ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection("notifications")
             .where("to", isEqualTo: user!.uid)
+            .orderBy("dateCreated")
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (!snapshot.hasData) {
@@ -220,13 +236,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
             );
           }
           return Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15),
+            padding: const EdgeInsets.only(left: 15, right: 15, bottom: 20),
             child: SafeArea(
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: ListView.builder(
+                  shrinkWrap: true,
+                  reverse: true,
                   itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
                     return GestureDetector(
@@ -234,26 +252,36 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         var typeId =
                             snapshot.data!.docChanges[index].doc['typeId'];
                         if (typeId == 4) {
-                          Navigator.push(
-                              (context),
-                              MaterialPageRoute(
-                                  builder: (context) => ContactBorrower(
-                                        borrowerUid: snapshot.data!
-                                            .docChanges[index].doc['from'],
-                                        refId: snapshot.data!.docChanges[index]
-                                            .doc['lend-item-id'],
-                                      )));
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => ContactBorrower(
+                                    borrowerUid: snapshot
+                                        .data!.docChanges[index].doc['from'],
+                                    refId: snapshot.data!.docChanges[index]
+                                        .doc['lend-item-id'],
+                                  )));
                         } else if (typeId == 5) {
-                          Navigator.push(
-                              (context),
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      TransactionGrantedDetails(
-                                        lenderUid: snapshot.data!
-                                            .docChanges[index].doc['from'],
-                                        refId: snapshot.data!.docChanges[index]
-                                            .doc['lend-item-id'],
-                                      )));
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => TransactionGrantedDetails(
+                                    lenderUid: snapshot
+                                        .data!.docChanges[index].doc['from'],
+                                    refId: snapshot.data!.docChanges[index]
+                                        .doc['lend-item-id'],
+                                  )));
+                        } else if (typeId == 6) {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => ReturnItemNotification(
+                                    borrowerUid: snapshot
+                                        .data!.docChanges[index].doc['from'],
+                                    refId: snapshot.data!.docChanges[index]
+                                        .doc['lend-item-id'],
+                                  )));
+                          print(6);
+                          print(snapshot.data!.docChanges[index].doc['from']);
+                          print(snapshot
+                              .data!.docChanges[index].doc['lend-item-id']);
+                        } else if (typeId == 1) {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => const NewUsersTable()));
                         } else {
                           print(
                               "${snapshot.data!.docChanges[index].doc.reference.id}");

@@ -10,6 +10,7 @@ import 'package:rentool/model/user_model.dart';
 import 'package:rentool/rent_items/place_rent.dart';
 import 'package:rentool/screens/hero_image.dart';
 import 'package:rentool/screens/home_screen.dart';
+import 'package:rentool/screens/navigation_bar.dart';
 import '../buildmaterialcolor.dart';
 
 class ItemDetails extends StatefulWidget {
@@ -73,11 +74,10 @@ class _ItemDetailsState extends State<ItemDetails> {
         leading: IconButton(
             onPressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => HomeScreen(
-                            tabIndex: 0,
-                          ))).then((value) {
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => NavigationBarScreen()))
+                  .then((value) {
                 setState(() {});
               });
             },
@@ -395,8 +395,7 @@ class _ItemDetailsState extends State<ItemDetails> {
       num price = int.parse(itemDetails.itemPrice!);
       num a = int.parse(lendItemDayController.text);
       num b = int.parse(lendItemQuantityController.text);
-      num dayPrice = price * a;
-      num c = dayPrice * b;
+      num c = price * a;
       num d = 10;
       num e = c + d;
       num f = int.parse(itemDetails.itemQuantity!);
@@ -407,9 +406,9 @@ class _ItemDetailsState extends State<ItemDetails> {
 
       // rent period calculation
       int dayLended = int.parse(lendItemDayController.text);
-      final DateTime dateFrom = DateTime.now();
-      final DateTime dateTo = dateFrom.add(Duration(days: dayLended));
-      String fdateFrom = DateFormat().format(dateFrom).toString();
+      var dateFrom = DateTime.now();
+      var dateTo = dateFrom.add(Duration(days: dayLended));
+      String fdateFrom = DateFormat().format(dateFrom);
       String fdateTo = DateFormat().format(dateTo);
       String rentCountDown = DateFormat("yyyy-MM-dd HH:mm:ss").format(dateTo);
 
@@ -422,9 +421,13 @@ class _ItemDetailsState extends State<ItemDetails> {
       lendedModel.shippingPayment = lendShippingController.text;
       lendedModel.totalPayment = lendTotalpaymentController.text;
       lendedModel.rentPeriod = "${fdateFrom} to ${fdateTo}";
-      lendedModel.rentPeriodFrom = fdateFrom;
-      lendedModel.rentPeriodTo = fdateTo;
+      lendedModel.rentPeriodFrom = dateFrom.toString();
+      lendedModel.rentPeriodTo = dateTo.toString();
       lendedModel.rentCountDown = rentCountDown;
+      lendedModel.extendedDay = "0";
+      lendedModel.serviceFee = "null";
+      lendedModel.extendPrice = "null";
+      lendedModel.lenderUid = itemDetails.uid.toString();
 
       // updating rent-items/itemQuantity
       await firebaseFirestore

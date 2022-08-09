@@ -5,6 +5,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:rentool/rent_items/add_rent.dart';
 import 'package:rentool/rent_items/edit_rent.dart';
+import 'package:rentool/screens/navigation_bar.dart';
 
 class LendedItems extends StatefulWidget {
   String? userId;
@@ -20,14 +21,15 @@ class _LendedItemsState extends State<LendedItems> {
   //     .where("uid", isEqualTo: "${widget.userId}")
   //     .snapshots();
 
-  final priceField = <TextSpan>[
-    new TextSpan(text: 'Hello'),
-    new TextSpan(
-        text: 'World', style: new TextStyle(fontWeight: FontWeight.bold)),
-  ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    int initialIndex = 0;
     // get selfie image url
     final userImage = StreamBuilder(
       stream: FirebaseFirestore.instance
@@ -55,12 +57,25 @@ class _LendedItemsState extends State<LendedItems> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => AddRent()));
+          Navigator.of(context, rootNavigator: true)
+              .push(MaterialPageRoute(builder: (context) => AddRent()));
         },
         child: const Icon(Icons.add),
       ),
-      appBar: AppBar(title: const Text("Lended Items")),
+      appBar: AppBar(
+        title: const Text("Your Items"),
+        leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+            ),
+            // passing this to our root
+            onPressed: () {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => NavigationBarScreen(
+                        tabIndex: 3,
+                      )));
+            }),
+      ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection("rent-items")
@@ -81,12 +96,11 @@ class _LendedItemsState extends State<LendedItems> {
             ),
             child: ListView.builder(
               itemCount: snapshot.data!.docs.length,
-              itemBuilder: (_, index) {
+              itemBuilder: (BuildContext context, index) {
                 return GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
+                    Navigator.of(context, rootNavigator: true)
+                        .push(MaterialPageRoute(
                             builder: (_) => EditRentItem(
                                   docId: snapshot.data!.docs[index],
                                 )));
@@ -116,7 +130,7 @@ class _LendedItemsState extends State<LendedItems> {
                                   .data!.docChanges[index].doc.reference.id,
                             ),
                             subtitle: Text(
-                              "${snapshot.data!.docChanges[index].doc['itemDescription']}",
+                              "Rating: ${snapshot.data!.docChanges[index].doc['ratings']}",
                               style: const TextStyle(fontSize: 16),
                               maxLines: 4,
                               overflow: TextOverflow.ellipsis,

@@ -3,6 +3,7 @@ class NotificationModel {
   String? body;
   String? from;
   String? to;
+  int? typeId;
   DateTime? dateCreated;
 
   NotificationModel({
@@ -10,6 +11,7 @@ class NotificationModel {
     this.body,
     this.from,
     this.to,
+    this.typeId,
     this.dateCreated,
   });
 
@@ -20,6 +22,7 @@ class NotificationModel {
       body: map['body'],
       from: map['from'],
       to: map['to'],
+      typeId: map['typeId'],
       dateCreated: map['dateCreated'],
     );
   }
@@ -31,6 +34,7 @@ class NotificationModel {
       'body': body,
       'from': from,
       'to': to,
+      'typeId': typeId,
       'dateCreated': DateTime.now(),
     };
   }

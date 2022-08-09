@@ -4,21 +4,20 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/borrow_items/borrow_item_details.dart';
 import 'package:rentool/buildmaterialcolor.dart';
 import 'package:rentool/rent_items/add_rent.dart';
+import 'package:rentool/rent_items/rented_item_details.dart';
 import 'package:rentool/screens/home_screen.dart';
-import 'package:rentool/screens/home_screen_default.dart';
 import 'package:rentool/screens/lend_items_screen.dart';
-import 'package:rentool/screens/navigation_bar.dart';
 
 import '../screens/hero_image.dart';
 
-class BorrowItemsList extends StatefulWidget {
-  BorrowItemsList({Key? key, required this.userId}) : super(key: key);
-  String? userId;
+class TransactionList extends StatefulWidget {
+  TransactionList({Key? key}) : super(key: key);
+
   @override
-  State<BorrowItemsList> createState() => _BorrowItemsListState();
+  State<TransactionList> createState() => _TransactionListState();
 }
 
-class _BorrowItemsListState extends State<BorrowItemsList> {
+class _TransactionListState extends State<TransactionList> {
   @override
   Widget build(BuildContext context) {
     String itemName, itemPrice, itemDescription;
@@ -47,33 +46,20 @@ class _BorrowItemsListState extends State<BorrowItemsList> {
     );
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => NavigationBarScreen()));
-        },
-        child: const Icon(Icons.add),
-      ),
-      appBar: AppBar(
-        title: const Text("Your Borrowed Items"),
-        leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back,
-            ),
-            // passing this to our root
-            onPressed: () {
-              Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) => NavigationBarScreen(
-                        tabIndex: 3,
-                      )));
-            }),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     Navigator.push(
+      //         context,
+      //         MaterialPageRoute(
+      //             builder: (context) => HomeScreen(
+      //                   tabIndex: 0,
+      //                 )));
+      //   },
+      //   child: const Icon(Icons.add),
+      // ),
+      appBar: AppBar(title: const Text("Transaction List")),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection("lend-items")
-            .where("uid", isEqualTo: widget.userId)
-            .where("status", isEqualTo: "accepted")
-            .snapshots(),
+        stream: FirebaseFirestore.instance.collection("lend-items").snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
             return const Text("something wrong");
@@ -95,13 +81,11 @@ class _BorrowItemsListState extends State<BorrowItemsList> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => BorrowitemDetails(
+                            builder: (context) => RentedItemDetails(
                                   rentItemId: snapshot
                                       .data!.docChanges[index].doc['itemId'],
                                   lendId: snapshot
                                       .data!.docChanges[index].doc['id'],
-                                  lenderUid: snapshot
-                                      .data!.docChanges[index].doc['lenderUid'],
                                 )));
                     print(snapshot.data!.docChanges[index].doc['id']);
                   },
@@ -109,9 +93,6 @@ class _BorrowItemsListState extends State<BorrowItemsList> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const SizedBox(
-                        height: 20,
-                      ),
                       Padding(
                         padding:
                             const EdgeInsets.only(top: 15, left: 5, right: 5),
@@ -127,7 +108,7 @@ class _BorrowItemsListState extends State<BorrowItemsList> {
                               imageRefId: snapshot
                                   .data!.docChanges[index].doc['itemId']),
                           subtitle: Text(
-                            "DATE RENTED: \nFrom ${snapshot.data!.docChanges[index].doc['rentPeriod']}",
+                            "Status: ${snapshot.data!.docChanges[index].doc['status']}",
                             style: const TextStyle(fontSize: 16),
                             maxLines: 4,
                             overflow: TextOverflow.ellipsis,
@@ -180,6 +161,8 @@ class _imageItem extends StatelessWidget {
         } else {
           String url = snapshot.data!.docs[0]["downloadURL"];
           return SizedBox(
+            height: 80,
+            width: 60,
             child: Image.network(
               url,
               fit: BoxFit.cover,

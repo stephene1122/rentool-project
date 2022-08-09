@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,16 +6,16 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/buildmaterialcolor.dart';
 import 'package:rentool/chat/chatpage.dart';
 import 'package:rentool/model/lend_items_model.dart';
-import 'package:rentool/model/notifications_model.dart';
 import 'package:rentool/model/rent_items_model.dart';
 import 'package:rentool/model/user_model.dart';
-import 'package:rentool/screens/home_screen.dart';
-import 'package:rentool/screens/navigation_bar.dart';
-import 'package:rentool/services/check_token_notification.dart';
 import 'package:http/http.dart' as http;
+import 'package:rentool/screens/notification_screen.dart';
 
-class ContactBorrower extends StatefulWidget {
-  ContactBorrower({
+import '../model/notifications_model.dart';
+import '../services/check_token_notification.dart';
+
+class ReturnItemNotification extends StatefulWidget {
+  ReturnItemNotification({
     Key? key,
     this.refId,
     this.borrowerUid,
@@ -27,17 +25,18 @@ class ContactBorrower extends StatefulWidget {
   String? refId;
 
   @override
-  State<ContactBorrower> createState() => _ContactBorrowerState();
+  State<ReturnItemNotification> createState() => _ReturnItemNotificationState();
 }
 
-class _ContactBorrowerState extends State<ContactBorrower> {
+class _ReturnItemNotificationState extends State<ReturnItemNotification> {
   User? user = FirebaseAuth.instance.currentUser;
-  LendItemModel lendItemDetails = LendItemModel();
+  var lendItemDetails = LendItemModel();
   RentItemModel rentItemDetails = RentItemModel();
   UserModel borrowerInfo = UserModel();
-
-  // notification initailization
-  String? nToken;
+  NotificationModel notifModel = NotificationModel();
+  FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+  String? aToken;
+  String? aUid;
 
   @override
   void initState() {
@@ -69,15 +68,13 @@ class _ContactBorrowerState extends State<ContactBorrower> {
       setState(() {});
     });
 
-    getFirebaseToken(widget.borrowerUid.toString());
-  }
-
-  void getFirebaseToken(String uid) async {
-    DocumentSnapshot snap =
-        await FirebaseFirestore.instance.collection("users").doc(uid).get();
-    String token = snap['nToken'];
-    nToken = token;
-    print(token);
+    // get Admin nToken
+    NotificationToken().getAdminToken().then((QuerySnapshot d) {
+      aToken = d.docs[0]['nToken'];
+      aUid = d.docs[0]['uid'];
+      print(aToken);
+      print(aUid);
+    });
   }
 
   void sendPushMessage(String body, String title) async {
@@ -97,7 +94,7 @@ class _ContactBorrowerState extends State<ContactBorrower> {
                 'id': '1',
                 'status': 'done'
               },
-              'to': nToken,
+              'to': "aToken",
             },
           ));
     } catch (e) {
@@ -109,8 +106,8 @@ class _ContactBorrowerState extends State<ContactBorrower> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Borrower Receipt Details"),
-      ),
+          // title: const Text("Receipt"),
+          ),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -121,7 +118,7 @@ class _ContactBorrowerState extends State<ContactBorrower> {
                 height: 15,
               ),
               SizedBox(
-                height: 80,
+                width: 260,
                 child: Image.asset(
                   "assets/logo.png",
                   fit: BoxFit.contain,
@@ -132,8 +129,8 @@ class _ContactBorrowerState extends State<ContactBorrower> {
               ),
               const Center(
                 child: Text(
-                  "Borrower Receipt Details",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  "Receipt Details",
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
               ),
               Padding(
@@ -375,158 +372,140 @@ class _ContactBorrowerState extends State<ContactBorrower> {
                 ),
               ),
               const SizedBox(
-                height: 15,
+                height: 30,
               ),
-              (lendItemDetails.status == "pending")
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Material(
-                            elevation: 5,
-                            borderRadius: BorderRadius.circular(30),
-                            color: HexColor("#C35E12"),
-                            child: MaterialButton(
-                              onPressed: () async {
-                                FirebaseFirestore.instance
-                                    .collection('lend-items')
-                                    .doc(widget.refId)
-                                    .update({'status': 'accepted'});
-
-                                NotificationModel notifModel =
-                                    NotificationModel();
-                                // writing all values
-                                notifModel.title = "Transaction Granted!";
-                                notifModel.body =
-                                    "Congrats, your transaction is accepted.";
-                                notifModel.from = user!.uid;
-                                notifModel.to = widget.borrowerUid;
-
-                                await FirebaseFirestore.instance
-                                    .collection("notifications")
-                                    .add(notifModel.toMap())
-                                    .then((value) {
-                                  FirebaseFirestore.instance
-                                      .collection("notifications")
-                                      .doc(value.id)
-                                      .update({
-                                    'id': value.id,
-                                    'typeId': 5,
-                                    'lend-item-id': widget.refId
-                                  });
-                                });
-
-                                // sending notification to lenderPhone
-                                String title = "Transaction Accepted!";
-                                String body =
-                                    "Lender will deliver the item to your location, please wait and prepare payment.\nThank you.";
-                                sendPushMessage(body, title);
-                                // navigate to chat screen
-                                // Navigator.push(
-                                //     (context),
-                                //     MaterialPageRoute(
-                                //         builder: (context) => chatpage(
-                                //               friendUid: widget.borrowerUid,
-                                //               friendEmail:
-                                //                   borrowerInfo.emailAddress,
-                                //               friendName: borrowerInfo.fullName,
-                                //             )));
-                                Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            super.widget));
-                              },
-                              child: const Text(
-                                "Accept Transaction",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                            )),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Material(
-                            elevation: 5,
-                            borderRadius: BorderRadius.circular(30),
-                            color: Colors.red,
-                            child: MaterialButton(
-                              onPressed: () async {
-                                // initializing value
-                                String title = "Transaction Declined!";
-                                String body =
-                                    "Lender have been declined the transaction, sorry for the inconvenience";
-                                // updating the rent quantity and the status decline
-                                num a =
-                                    int.parse(rentItemDetails.itemQuantity!);
-                                num b = int.parse(
-                                    lendItemDetails.lendItemQuantity!);
-                                num c = a + b;
-                                c.toInt();
-                                await FirebaseFirestore.instance
-                                    .collection('rent-items')
-                                    .doc(lendItemDetails.itemId)
-                                    .update({"itemQuantity": c.toString()});
-                                await FirebaseFirestore.instance
-                                    .collection('lend-items')
-                                    .doc(widget.refId)
-                                    .update({'status': 'declined'});
-
-                                // create notification for declined transaction
-                                FirebaseFirestore.instance
-                                    .collection("notifications")
-                                    .add({
-                                  "dateCreated": DateTime.now(),
-                                  "title": title,
-                                  "body": body,
-                                  "from": user!.uid,
-                                  "to": lendItemDetails.uid,
-                                  "typeId": 10,
-                                  "lend-item-id": lendItemDetails.id
-                                }).then((value) {
-                                  FirebaseFirestore.instance
-                                      .collection("notifications")
-                                      .doc(value.id)
-                                      .update({"id": value.id});
-                                });
-
-                                // send phone notification
-                                sendPushMessage(body, title);
-
-                                Navigator.push(
-                                    (context),
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            NavigationBarScreen()));
-                              },
-                              child: const Text(
-                                "Decline Transaction",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                            )),
-                      ],
+              (lendItemDetails.status == "completed")
+                  ? const SizedBox(
+                      height: 15,
                     )
-                  : (lendItemDetails.status == "declined")
-                      ? const Text(
-                          "Transaction Declined!",
+                  : checkRentExtended(lendItemDetails.extendedDay!),
+              (lendItemDetails.status == "completed")
+                  ? const Text(
+                      "TRANSACTION COMPLETED",
+                      style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500),
+                    )
+                  : Material(
+                      elevation: 5,
+                      borderRadius: BorderRadius.circular(30),
+                      color: Colors.blue,
+                      child: MaterialButton(
+                        padding: const EdgeInsets.fromLTRB(20, 5, 20, 5),
+                        minWidth: 350,
+                        onPressed: () {
+                          // Navigator.push(
+                          //     (context),
+                          //     MaterialPageRoute(
+                          //         builder: (context) => chatpage(
+                          //               friendUid: widget.borrowerUid,
+                          //               friendEmail: borrowerInfo.emailAddress,
+                          //               friendName: borrowerInfo.fullName,
+                          //             )));
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                    title: const Text("Complete transaction?"),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () =>
+                                              {Navigator.pop(context)},
+                                          child: const Text("Cancel")),
+                                      TextButton(
+                                          onPressed: () async {
+                                            // Navigator.pop(context);
+                                            // update the for rent item quantity
+                                            var lendedItemQuantity = int.parse(
+                                                lendItemDetails
+                                                    .lendItemQuantity!);
+                                            var cRentItemQuantity = int.parse(
+                                                rentItemDetails.itemQuantity!);
+                                            var com = lendedItemQuantity +
+                                                cRentItemQuantity;
+                                            await FirebaseFirestore.instance
+                                                .collection("rent-items")
+                                                .doc(lendItemDetails.itemId)
+                                                .update({
+                                              "itemQuantity": com.toString(),
+                                            });
+                                            await FirebaseFirestore.instance
+                                                .collection("lend-items")
+                                                .doc(lendItemDetails.id)
+                                                .update({
+                                              "dateCompleted": DateTime.now(),
+                                              "status": "completed"
+                                            });
+                                            // notify the admin thet transaction is completed
+                                            String title =
+                                                "Transaction Completed";
+                                            String body =
+                                                "The item has been return to the owner, and the transaction is successfully completed!";
+                                            sendPushMessage(body, title);
+
+                                            // saving data into database for the notification
+                                            await firebaseFirestore
+                                                .collection("notifications")
+                                                .add({
+                                              "title": title,
+                                              "body": body,
+                                              "dateCreated": DateTime.now(),
+                                              "from":
+                                                  widget.borrowerUid.toString(),
+                                              "to": aUid,
+                                              "lend-item-id": widget.refId,
+                                              "typeId": 9
+                                            }).then((value) async {
+                                              await firebaseFirestore
+                                                  .collection("notifications")
+                                                  .doc(value.id)
+                                                  .update({"id": value.id});
+                                            });
+
+                                            // show Transaction successfully completed
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) =>
+                                                    AlertDialog(
+                                                      title: const Text(
+                                                          "Transaction Successfully Completed!"),
+                                                      actions: [
+                                                        TextButton(
+                                                            onPressed: () {
+                                                              // Navigator.pushReplacement(
+                                                              //     context,
+                                                              //     MaterialPageRoute(
+                                                              //         builder: (BuildContext context) =>
+                                                              //             super.widget));
+                                                              Navigator.of(
+                                                                      context,
+                                                                      rootNavigator:
+                                                                          true)
+                                                                  .pushAndRemoveUntil(
+                                                                      MaterialPageRoute(
+                                                                          builder: (context) =>
+                                                                              NotificationScreen()),
+                                                                      (route) =>
+                                                                          false);
+                                                            },
+                                                            child: const Text(
+                                                                "Ok")),
+                                                      ],
+                                                    ));
+                                          },
+                                          child: const Text("Ok")),
+                                    ],
+                                  ));
+                        },
+                        child: const Text(
+                          "Item Return",
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500),
-                        )
-                      : const Text(
-                          "Transaction Accepted!",
-                          style: TextStyle(
-                              color: Colors.orange,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500),
+                              fontSize: 15,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600),
                         ),
+                      )),
               const SizedBox(
                 height: 15,
               ),
@@ -538,14 +517,12 @@ class _ContactBorrowerState extends State<ContactBorrower> {
                     padding: const EdgeInsets.fromLTRB(20, 5, 20, 5),
                     minWidth: 350,
                     onPressed: () {
-                      Navigator.push(
-                          (context),
-                          MaterialPageRoute(
-                              builder: (context) => chatpage(
-                                    friendUid: widget.borrowerUid,
-                                    friendEmail: borrowerInfo.emailAddress,
-                                    friendName: borrowerInfo.fullName,
-                                  )));
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => chatpage(
+                                friendUid: widget.borrowerUid,
+                                friendEmail: borrowerInfo.emailAddress,
+                                friendName: borrowerInfo.fullName,
+                              )));
                     },
                     child: const Text(
                       "Contact Borrower",
@@ -564,5 +541,54 @@ class _ContactBorrowerState extends State<ContactBorrower> {
         ),
       ),
     );
+  }
+
+  checkRentExtended(d) {
+    if (d != "0") {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text(
+            "Additional Rent Payment",
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Text(
+            "Service fee: ₱${lendItemDetails.serviceFee}",
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Text(
+            "Additional Day: ${lendItemDetails.extendedDay} day",
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Text(
+            "Item Price: ₱${rentItemDetails.itemPrice}",
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Text(
+            "Total: (${rentItemDetails.itemPrice} * ${lendItemDetails.extendedDay}) + ${lendItemDetails.serviceFee} = ₱${lendItemDetails.extendPrice}",
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+          ),
+          const SizedBox(
+            height: 30,
+          ),
+        ],
+      );
+    } else {
+      return const SizedBox(
+        height: 0,
+      );
+    }
   }
 }

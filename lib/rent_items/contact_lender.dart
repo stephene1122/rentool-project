@@ -11,6 +11,7 @@ import 'package:rentool/model/rent_items_model.dart';
 import 'package:rentool/model/user_model.dart';
 import 'package:rentool/screens/home_screen.dart';
 import 'package:rentool/screens/lend_items_screen.dart';
+import 'package:rentool/screens/navigation_bar.dart';
 
 class ContactLender extends StatefulWidget {
   ContactLender({
@@ -70,9 +71,9 @@ class _ContactLenderState extends State<ContactLender> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Receipt"),
-      ),
+      // appBar: AppBar(
+      //   title: const Text("Receipt"),
+      // ),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -80,7 +81,7 @@ class _ContactLenderState extends State<ContactLender> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(
-                height: 15,
+                height: 55,
               ),
               SizedBox(
                 height: 80,
@@ -370,8 +371,10 @@ class _ContactLenderState extends State<ContactLender> {
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.push((context),
-                      MaterialPageRoute(builder: (context) => HomeScreen()));
+                  Navigator.push(
+                      (context),
+                      MaterialPageRoute(
+                          builder: (context) => NavigationBarScreen()));
                 },
                 child: const Text(
                   "Rent more",

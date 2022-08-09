@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/rent_items/rent_list.dart';
@@ -11,6 +12,7 @@ class RentItemThankYouScreen extends StatefulWidget {
 }
 
 class _RentItemThankYouScreenState extends State<RentItemThankYouScreen> {
+  final _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,10 +68,13 @@ class _RentItemThankYouScreenState extends State<RentItemThankYouScreen> {
                     padding: const EdgeInsets.fromLTRB(20, 5, 20, 5),
                     minWidth: 350,
                     onPressed: () {
-                      Navigator.pushReplacement(
-                          context,
-                          new MaterialPageRoute(
-                              builder: (context) => new LendedItems()));
+                      Navigator.of(context, rootNavigator: false)
+                          .pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (context) => LendedItems(
+                                        userId: _auth.currentUser!.uid,
+                                      )),
+                              (route) => route.isFirst);
                     },
                     child: const Text(
                       "Check your Item",

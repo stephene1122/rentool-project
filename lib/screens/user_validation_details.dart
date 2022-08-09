@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/model/notifications_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:rentool/screens/user_validation_table.dart';
 
 import '../widgets/info_card.dart';
 import 'hero_image.dart';
@@ -137,6 +138,39 @@ class _UserValidationDetailsState extends State<UserValidationDetails> {
       },
     );
 
+    // get user selfie image url
+    final userSelfie = StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection("users")
+          .doc(widget.uid)
+          .collection("images-user-selfie")
+          .limit(1)
+          .snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) {
+          return SizedBox(
+              height: 80, child: Image.asset("assets/square-image.png"));
+        }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          String url = snapshot.data!.docs[0]['downloadURL'];
+          return GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => HeroImage(tagUrl: url)));
+            },
+            child: Hero(
+              tag: url,
+              child: Image.network(url),
+            ),
+          );
+        }
+      },
+    );
+
     return StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection("users")
@@ -168,15 +202,15 @@ class _UserValidationDetailsState extends State<UserValidationDetails> {
                                     color: HexColor("#E4B43D"),
                                     fontWeight: FontWeight.bold)),
                           ),
-                          Text(
-                            "Passionate Learner",
-                            style: GoogleFonts.sourceSansPro(
-                                textStyle: TextStyle(
-                                    fontSize: 25,
-                                    color: Colors.blueGrey[200],
-                                    letterSpacing: 2.5,
-                                    fontWeight: FontWeight.bold)),
-                          ),
+                          // Text(
+                          //   "Passionate Learner",
+                          //   style: GoogleFonts.sourceSansPro(
+                          //       textStyle: TextStyle(
+                          //           fontSize: 25,
+                          //           color: Colors.blueGrey[200],
+                          //           letterSpacing: 2.5,
+                          //           fontWeight: FontWeight.bold)),
+                          // ),
                           const SizedBox(
                             height: 20,
                             width: 200,
@@ -201,6 +235,36 @@ class _UserValidationDetailsState extends State<UserValidationDetails> {
                               text:
                                   snapshot.data!.docChanges[0].doc['birthDate'],
                               icon: Icons.cake),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const SizedBox(
+                            child: Text(
+                              "User Selfie",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          SizedBox(
+                            width: 340,
+                            child: userSelfie,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const SizedBox(
+                            child: Text(
+                              "Valid ID",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
                           SizedBox(
                             width: 340,
                             child: userValidId,
@@ -235,7 +299,8 @@ class _UserValidationDetailsState extends State<UserValidationDetails> {
                                   .doc(snapshot.data!.docChanges[0].doc['uid'])
                                   .update({"isUserGranted": "1"});
                               Fluttertoast.showToast(msg: "Success!");
-                              Navigator.of(context).pop();
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => NewUsersTable()));
                             },
                             child: const Text("Verify User"),
                           )

@@ -10,6 +10,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/buildmaterialcolor.dart';
 import 'package:rentool/screens/home_screen.dart';
+import 'package:rentool/screens/navigation_bar.dart';
 import 'package:rentool/screens/registration_screen.dart';
 import 'package:rentool/services/user_admin.dart';
 import 'package:http/http.dart' as http;
@@ -316,7 +317,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            const RegistrationScreen()));
+                                            RegistrationScreen()));
                               },
                               child: Text(
                                 "Sign Up",
@@ -350,8 +351,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   print(isLoginUserValidated);
                   if (isLoginUserValidated == "1") {
                     Fluttertoast.showToast(msg: "Login Successful");
-                    Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => HomeScreen()));
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                        builder: (context) => NavigationBarScreen()));
                   } else {
                     Fluttertoast.showToast(
                         msg: "Your account is not yet validated");

@@ -6,6 +6,7 @@ class RentItemModel {
   String? itemPrice;
   String? itemQuantity;
   DateTime? itemCreated;
+  String? ratings;
 
   RentItemModel({
     this.itemId,
@@ -15,6 +16,7 @@ class RentItemModel {
     this.itemPrice,
     this.itemQuantity,
     this.itemCreated,
+    this.ratings,
   });
 
   // taking data from server
@@ -26,6 +28,7 @@ class RentItemModel {
       itemPrice: map['itemPrice'],
       itemQuantity: map['itemQuantity'],
       itemId: map['itemId'],
+      ratings: map['ratings'],
     );
   }
 
@@ -38,6 +41,7 @@ class RentItemModel {
       'itemDescription': itemDescription,
       'itemPrice': itemPrice,
       'itemQuantity': itemQuantity,
+      'ratings': ratings,
       'dateCreated': DateTime.now(),
     };
   }

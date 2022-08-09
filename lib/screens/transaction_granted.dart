@@ -4,6 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:rentool/borrow_items/borrow_item_details.dart';
+import 'package:rentool/borrow_items/borrow_item_details2.dart';
+import 'package:rentool/borrow_items/borrow_item_list.dart';
+import 'package:rentool/model/lend_items_model.dart';
 import 'package:rentool/screens/login_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:rentool/services/check_token_notification.dart';
@@ -25,6 +29,7 @@ class TransactionGrantedDetails extends StatefulWidget {
 
 class _TransactionGrantedDetailsState extends State<TransactionGrantedDetails> {
   UserModel lenderInfo = UserModel();
+  LendItemModel lendedItemInfo = LendItemModel();
   // String? nToken;
   // String? aToken;
   // String? aUid;
@@ -46,8 +51,16 @@ class _TransactionGrantedDetailsState extends State<TransactionGrantedDetails> {
         .get()
         .then((value) {
       lenderInfo = UserModel.fromMap(value.data());
+      setState(() {});
     });
-    setState(() {});
+    FirebaseFirestore.instance
+        .collection("lend-items")
+        .doc(widget.refId)
+        .get()
+        .then((value) {
+      lendedItemInfo = LendItemModel.fromMap(value.data());
+      setState(() {});
+    });
   }
 
   // void getFirebaseToken() async {
@@ -119,6 +132,14 @@ class _TransactionGrantedDetailsState extends State<TransactionGrantedDetails> {
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(
+                height: 10,
+              ),
+              const Text(
+                "Lender will deliver the item to your location, please wait and prepare payment.\nThank you.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+              const SizedBox(
                 height: 35,
               ),
               const Text(
@@ -128,6 +149,48 @@ class _TransactionGrantedDetailsState extends State<TransactionGrantedDetails> {
               ),
               const SizedBox(
                 height: 35,
+              ),
+              GestureDetector(
+                onTap: () async {
+                  // String title = "New User!";
+                  // String body = "Account created! Verify the user information";
+
+                  // // sendPushMessage(aToken!, body, title);
+
+                  // FirebaseFirestore firebaseFirestore =
+                  //     FirebaseFirestore.instance;
+
+                  // NotificationModel notifModel = NotificationModel();
+                  // // writing all values
+                  // notifModel.title = title;
+                  // notifModel.body = body;
+                  // notifModel.from = widget.uid;
+                  // notifModel.to = aUid;
+
+                  // await firebaseFirestore
+                  //     .collection("notifications")
+                  //     .add(notifModel.toMap());
+
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => BorrowitemDetails2(
+                                lendId: lendedItemInfo.id.toString(),
+                                rentItemId: lendedItemInfo.itemId.toString(),
+                              ),
+                          maintainState: false));
+                  // logout(context);
+                },
+                child: Text(
+                  "Go to Borrowed Items",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 15,
+                      color: HexColor("#C35E12")),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
               ),
               Material(
                   elevation: 5,
@@ -155,39 +218,6 @@ class _TransactionGrantedDetailsState extends State<TransactionGrantedDetails> {
                           fontWeight: FontWeight.w600),
                     ),
                   )),
-              // GestureDetector(
-              //   onTap: () async {
-              //     // String title = "New User!";
-              //     // String body = "Account created! Verify the user information";
-
-              //     // // sendPushMessage(aToken!, body, title);
-
-              //     // FirebaseFirestore firebaseFirestore =
-              //     //     FirebaseFirestore.instance;
-
-              //     // NotificationModel notifModel = NotificationModel();
-              //     // // writing all values
-              //     // notifModel.title = title;
-              //     // notifModel.body = body;
-              //     // notifModel.from = widget.uid;
-              //     // notifModel.to = aUid;
-
-              //     // await firebaseFirestore
-              //     //     .collection("notifications")
-              //     //     .add(notifModel.toMap());
-
-              //     // Navigator.push(context,
-              //     //     MaterialPageRoute(builder: (context) => LoginScreen()));
-              //     // logout(context);
-              //   },
-              //   child: Text(
-              //     "Click here to process",
-              //     style: TextStyle(
-              //         fontWeight: FontWeight.w400,
-              //         fontSize: 15,
-              //         color: HexColor("#C35E12")),
-              //   ),
-              // )
             ],
           ),
         ),

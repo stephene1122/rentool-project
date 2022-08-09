@@ -95,12 +95,12 @@ class _AddRentState extends State<AddRent> {
         controller: itemNameEditingController,
         keyboardType: TextInputType.name,
         validator: (value) {
-          RegExp regex = new RegExp(r'^.{6,}$');
+          RegExp regex = new RegExp(r'^.{3,}$');
           if (value!.isEmpty) {
             return ("Item name cannot be empty");
           }
           if (!regex.hasMatch(value)) {
-            return ("Please enter valid name(Min. 6 Character)");
+            return ("Please enter valid name(Min. 3 Character)");
           }
           return null;
         },
@@ -127,12 +127,12 @@ class _AddRentState extends State<AddRent> {
         minLines: 1,
         maxLines: 5,
         validator: (value) {
-          RegExp regex = new RegExp(r'^.{6,}$');
+          RegExp regex = new RegExp(r'^.{3,}$');
           if (value!.isEmpty) {
             return ("Item description cannot be empty");
           }
           if (!regex.hasMatch(value)) {
-            return ("Please enter value(Min. 6 Character)");
+            return ("Please enter value(Min. 3 Character)");
           }
           return null;
         },
@@ -158,12 +158,8 @@ class _AddRentState extends State<AddRent> {
         controller: itemPriceEditingController,
         keyboardType: TextInputType.number,
         validator: (value) {
-          RegExp regex = new RegExp(r'^.{6,}$');
           if (value!.isEmpty) {
             return ("Item price cannot be empty");
-          }
-          if (!regex.hasMatch(value)) {
-            return ("Please enter value(Min. 6 Character)");
           }
           return null;
         },
@@ -189,13 +185,10 @@ class _AddRentState extends State<AddRent> {
         controller: itemQuantityEditingController,
         keyboardType: TextInputType.number,
         validator: (value) {
-          RegExp regex = new RegExp(r'^.{6,}$');
           if (value!.isEmpty) {
             return ("Item quantity cannot be empty");
           }
-          if (!regex.hasMatch(value)) {
-            return ("Please enter value(Min. 6 Character)");
-          }
+
           return null;
         },
         onSaved: (value) {
@@ -260,7 +253,12 @@ class _AddRentState extends State<AddRent> {
           padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: 265,
           onPressed: () {
-            postDetailsToFirestore();
+            if (_image == null) {
+              showSnackBar(
+                  "Please select a image!", const Duration(seconds: 1));
+            } else {
+              postDetailsToFirestore();
+            }
           },
           child: const Text(
             "Place Item",
@@ -363,32 +361,34 @@ class _AddRentState extends State<AddRent> {
   }
 
   postDetailsToFirestore() async {
-    // calling our firestore
-    // calling our user model
-    // sending these values
+    if (_formKey.currentState!.validate()) {
+      // calling our firestore
+      // calling our user model
+      // sending these values
+      FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+      User? user = _auth.currentUser;
 
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    User? user = _auth.currentUser;
+      RentItemModel rentItemModel = RentItemModel();
+      // writing all the values
+      rentItemModel.uid = user!.uid;
+      rentItemModel.itemName = itemNameEditingController.text.toUpperCase();
+      rentItemModel.itemDescription = itemDescriptionEditingController.text;
+      rentItemModel.itemPrice = itemPriceEditingController.text;
+      rentItemModel.itemQuantity = itemQuantityEditingController.text;
+      rentItemModel.ratings = "0";
 
-    RentItemModel rentItemModel = RentItemModel();
-    // writing all the values
-    rentItemModel.uid = user!.uid;
-    rentItemModel.itemName = itemNameEditingController.text.toUpperCase();
-    rentItemModel.itemDescription = itemDescriptionEditingController.text;
-    rentItemModel.itemPrice = itemPriceEditingController.text;
-    rentItemModel.itemQuantity = itemQuantityEditingController.text;
-
-    await firebaseFirestore
-        .collection("rent-items")
-        .add(rentItemModel.toMap())
-        .then((value) {
-      firebaseFirestore.collection("rent-items").doc(value.id).update({
-        'itemId': value.id,
+      await firebaseFirestore
+          .collection("rent-items")
+          .add(rentItemModel.toMap())
+          .then((value) {
+        firebaseFirestore.collection("rent-items").doc(value.id).update({
+          'itemId': value.id,
+        });
+        uploadImage(value.id);
       });
-      uploadImage(value.id);
-    });
-    // Fluttertoast.showToast(msg: "For rent item created successfully");
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => RentItemThankYouScreen()));
+      // Fluttertoast.showToast(msg: "For rent item created successfully");
+      Navigator.of(context, rootNavigator: true).push(
+          MaterialPageRoute(builder: (context) => RentItemThankYouScreen()));
+    }
   }
 }

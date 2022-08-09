@@ -7,6 +7,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/model/chatted_friend_model.dart';
 import 'package:rentool/screens/home_screen.dart';
 import 'package:rentool/screens/login_screen.dart';
+import 'package:rentool/screens/navigation_bar.dart';
 import 'package:rentool/services/chatted_friend.dart';
 import '../model/user_model.dart';
 import 'message.dart';
@@ -120,9 +121,9 @@ class _chatpageState extends State<chatpage> {
           onPressed: () {
             Navigator.push(
                 context,
-                CupertinoPageRoute(
-                    builder: (context) => HomeScreen(
-                          tabIndex: 1,
+                MaterialPageRoute(
+                    builder: (context) => NavigationBarScreen(
+                          tabIndex: 2,
                         )));
           },
         ),
@@ -203,20 +204,7 @@ class _chatpageState extends State<chatpage> {
                         'email': _auth.currentUser!.email,
                         'isSeen': false
                       });
-                      // adding chat friend list
-                      // if (widget.friendUid != friendedUID) {
-                      //   fs
-                      //       .collection("users")
-                      //       .doc(_auth.currentUser!.uid)
-                      //       .collection("chatted-friend")
-                      //       .add({
-                      //     "uid": widget.friendUid,
-                      //     "friend-chat-name": getUser.fullName,
-                      //     "friend-chat-contact": getUser.contactNumber,
-                      //     "friend-chat-email": getUser.emailAddress,
-                      //     "dateCreated": DateTime.now(),
-                      //   }).then((value) {});
-                      // }
+
                       message.clear();
                     }
                   },

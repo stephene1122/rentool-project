@@ -133,6 +133,7 @@ class _RegistrationScreenNotifState extends State<RegistrationScreenNotif> {
                   notifModel.body = body;
                   notifModel.from = widget.uid;
                   notifModel.to = aUid;
+                  notifModel.typeId = 1;
 
                   await firebaseFirestore
                       .collection("notifications")

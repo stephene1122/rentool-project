@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/rent_items/item_details.dart';
+import 'package:rentool/screens/home_screen.dart';
+import 'package:rentool/screens/navigation_bar.dart';
 
 import '../buildmaterialcolor.dart';
 
@@ -20,6 +22,18 @@ class _LendItemsScreenState extends State<LendItemsScreen> {
   String? searchString;
 
   final _auth = FirebaseAuth.instance;
+
+  // Future refresh() async {
+  //   Navigator.pushReplacement(context,
+  //       MaterialPageRoute(builder: (BuildContext context) => HomeScreen()));
+  // }
+
+  Future<void> refresh() {
+    return Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => NavigationBarScreen(
+              tabIndex: 0,
+            )));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,179 +117,123 @@ class _LendItemsScreenState extends State<LendItemsScreen> {
               ],
             )),
       ),
-      body: StreamBuilder(
-        stream: (searchString == null || searchString == '')
-            ? FirebaseFirestore.instance
-                .collection("rent-items")
-                .where("uid", isNotEqualTo: _auth.currentUser!.uid)
-                .snapshots()
-            : FirebaseFirestore.instance
-                .collection("rent-items")
-                .where("itemName", isGreaterThan: searchString)
-                .where("uid", isNotEqualTo: _auth.currentUser!.uid)
-                .snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) {
-            return const Text("something wrong");
-          }
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          return Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15),
-            child: SafeArea(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListView.builder(
-                  itemCount: snapshot.data!.docs.length,
-                  itemBuilder: (_, index) {
-                    return (snapshot
-                                .data!.docChanges[index].doc['itemQuantity'] ==
-                            "0")
-                        ? GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) => const AlertDialog(
-                                        backgroundColor: Colors.red,
-                                        contentPadding:
-                                            EdgeInsets.fromLTRB(20, 23, 20, 23),
-                                        title: Center(
-                                            child: Text(
-                                          "Alert!",
-                                          style: TextStyle(color: Colors.white),
-                                        )),
-                                        content: Text(
-                                            "    This item has been wipe out!",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                            )),
-                                      ));
-                            },
-                            child: Column(
-                              children: [
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.only(left: 3, right: 3),
-                                  child: ListTile(
-                                      tileColor: HexColor("#E3B13B"),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(3),
-                                          side: BorderSide(
-                                              color: HexColor("#C35E12"))),
-                                      title: Text(
-                                        "${snapshot.data!.docChanges[index].doc['itemName']}",
-                                        style: const TextStyle(fontSize: 20),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      leading: _imageItem(
-                                        refId: snapshot.data!.docChanges[index]
-                                            .doc.reference.id,
-                                      ),
-                                      subtitle: Text(
-                                        "${snapshot.data!.docChanges[index].doc['itemDescription']}",
-                                        style: const TextStyle(fontSize: 16),
-                                        maxLines: 4,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
+      body: RefreshIndicator(
+        onRefresh: refresh,
+        child: StreamBuilder(
+          stream: (searchString == null || searchString == '')
+              ? FirebaseFirestore.instance
+                  .collection("rent-items")
+                  .where("uid", isNotEqualTo: _auth.currentUser!.uid)
+                  .snapshots()
+              : FirebaseFirestore.instance
+                  .collection("rent-items")
+                  .where("itemName", isGreaterThan: searchString)
+                  .where("uid", isNotEqualTo: _auth.currentUser!.uid)
+                  .snapshots(),
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return const Text("something wrong");
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return Padding(
+              padding: const EdgeInsets.only(left: 15, right: 15),
+              child: SafeArea(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (_, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          if (snapshot.data!.docChanges[index]
+                                  .doc['itemQuantity'] ==
+                              "0") {
+                            showDialog(
+                                context: context,
+                                builder: (context) => const AlertDialog(
+                                      backgroundColor: Colors.red,
                                       contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              vertical: 12, horizontal: 16),
-                                      trailing: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "Price: ${snapshot.data!.docChanges[index].doc['itemPrice']} \n\nQuantity: ${snapshot.data!.docChanges[index].doc['itemQuantity']}",
-                                            style:
-                                                const TextStyle(fontSize: 15),
-                                          )
-                                        ],
+                                          EdgeInsets.fromLTRB(20, 23, 20, 23),
+                                      title: Center(
+                                          child: Text(
+                                        "Alert!",
+                                        style: TextStyle(color: Colors.white),
                                       )),
-                                ),
-                              ],
+                                      content: Text(
+                                          "    This item has been wipe out!",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          )),
+                                    ));
+                          } else {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (_) => ItemDetails(
+                                      refId: snapshot.data!.docChanges[index]
+                                          .doc.reference.id,
+                                    )));
+                            print(
+                                "${snapshot.data!.docChanges[index].doc.reference.id}");
+                          }
+                        },
+                        child: Column(
+                          children: [
+                            const SizedBox(
+                              height: 20,
                             ),
-                          )
-                        : GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => ItemDetails(
-                                            refId: snapshot
-                                                .data!
-                                                .docChanges[index]
-                                                .doc
-                                                .reference
-                                                .id,
-                                          )));
-                              print(
-                                  "${snapshot.data!.docChanges[index].doc.reference.id}");
-                            },
-                            child: Column(
-                              children: [
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.only(left: 3, right: 3),
-                                  child: ListTile(
-                                      tileColor: HexColor("#E3B13B"),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(3),
-                                          side: BorderSide(
-                                              color: HexColor("#C35E12"))),
-                                      title: Text(
-                                        "${snapshot.data!.docChanges[index].doc['itemName']}",
-                                        style: const TextStyle(fontSize: 20),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      leading: _imageItem(
-                                        refId: snapshot.data!.docChanges[index]
-                                            .doc.reference.id,
-                                      ),
-                                      subtitle: Text(
-                                        "${snapshot.data!.docChanges[index].doc['itemDescription']}",
-                                        style: const TextStyle(fontSize: 16),
-                                        maxLines: 4,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              vertical: 12, horizontal: 16),
-                                      trailing: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "Price: ${snapshot.data!.docChanges[index].doc['itemPrice']} \n\nQuantity: ${snapshot.data!.docChanges[index].doc['itemQuantity']}",
-                                            style:
-                                                const TextStyle(fontSize: 15),
-                                          )
-                                        ],
-                                      )),
-                                ),
-                              ],
+                            Padding(
+                              padding: const EdgeInsets.only(left: 3, right: 3),
+                              child: ListTile(
+                                  tileColor: HexColor("#E3B13B"),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(3),
+                                      side: BorderSide(
+                                          color: HexColor("#C35E12"))),
+                                  title: Text(
+                                    "${snapshot.data!.docChanges[index].doc['itemName']}",
+                                    style: const TextStyle(fontSize: 20),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  leading: _imageItem(
+                                    refId: snapshot.data!.docChanges[index].doc
+                                        .reference.id,
+                                  ),
+                                  subtitle: Text(
+                                    "Total Rating: ${snapshot.data!.docChanges[index].doc['ratings']}",
+                                    style: const TextStyle(fontSize: 16),
+                                    maxLines: 4,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 12, horizontal: 16),
+                                  trailing: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Price: ${snapshot.data!.docChanges[index].doc['itemPrice']} \n\nQuantity: ${snapshot.data!.docChanges[index].doc['itemQuantity']}",
+                                        style: const TextStyle(fontSize: 15),
+                                      )
+                                    ],
+                                  )),
                             ),
-                          );
-                  },
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

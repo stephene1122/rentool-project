@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/borrow_items/borrow_item_list.dart';
 import 'package:rentool/rent_items/rent_list.dart';
+import 'package:rentool/rent_items/rented_item_list.dart';
 import 'package:rentool/side_navbar.dart';
 import '../model/user_model.dart';
 import '../rent_items/add_rent.dart';
@@ -97,7 +98,7 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        LendedItems(userId: loggedInUser.uid)));
+                        RentedItemsList(userId: loggedInUser.uid)));
           },
           child: const Text(
             "Lended Items",
@@ -197,10 +198,10 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
   }
 
   Widget buildRentalButton() => FloatingActionButton.extended(
-        label: const Text("Create Item"),
+        label: const Text("Your Items"),
         onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => AddRent()));
+          Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+              builder: (context) => LendedItems(userId: loggedInUser.uid)));
         },
         icon: const Icon(Icons.construction_rounded),
         backgroundColor: HexColor("#E4B43D"),

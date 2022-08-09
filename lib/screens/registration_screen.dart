@@ -4,16 +4,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:rentool/buildmaterialcolor.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/imageupload/registration_upload_validid.dart';
 import 'package:rentool/model/user_model.dart';
 import 'package:intl/intl.dart';
+import 'package:rentool/screens/agreement_screen.dart';
 import 'package:rentool/services/check_token_notification.dart';
 
 class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({Key? key}) : super(key: key);
-
+  RegistrationScreen({Key? key, this.checkBox}) : super(key: key);
+  bool? checkBox;
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
@@ -24,6 +26,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     // TODO: implement initState
     super.initState();
     getToken();
+    // conditions for the value of checkbox
+    if (widget.checkBox == true) {
+      _checkedValue = true;
+    } else {
+      _checkedValue = false;
+    }
   }
 
   void getToken() async {
@@ -51,6 +59,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   String? mtoken;
   String? ctoken;
+  bool? _checkedValue;
 
   // show date picker and format date
   Future _selectDate() async {
@@ -357,11 +366,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               ctoken = token;
               if (token.isNotEmpty) {
                 Fluttertoast.showToast(
-                    msg: "This device already have an account.");
+                    msg: "This device has already an account.");
               }
             });
-            singnUpFunction(emailAddressEditingController.text,
-                passwordEditingController.text);
+            if (_checkedValue == true) {
+              singnUpFunction(emailAddressEditingController.text,
+                  passwordEditingController.text);
+            } else {
+              Fluttertoast.showToast(
+                  msg: "Please accept our Terms & Conditions!");
+            }
           },
           child: const Text(
             "Next",
@@ -370,6 +384,42 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 fontSize: 15, color: Colors.white, fontWeight: FontWeight.w600),
           ),
         ));
+
+    // checkBox
+    final checkBox = CheckboxListTile(
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 1,
+      ),
+      title: GestureDetector(
+        child: Text(
+          "Our Terms & Conditions",
+          style: GoogleFonts.roboto(
+            fontStyle: FontStyle.italic,
+            fontWeight: FontWeight.w500,
+            fontSize: 17,
+          ),
+        ),
+        onTap: () {
+          Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+              builder: (context) => TermsOfAgreementScreen()));
+        },
+      ), //    <-- label
+      value: _checkedValue,
+      onChanged: (d) {
+        if (d!) {
+          setState(() {
+            _checkedValue = d;
+          });
+          print(_checkedValue);
+        } else {
+          setState(() {
+            _checkedValue = d;
+          });
+          print(_checkedValue);
+        }
+      },
+      controlAffinity: ListTileControlAffinity.leading,
+    );
 
     return Scaffold(
         backgroundColor: Colors.white,
@@ -440,6 +490,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           height: 10,
                         ),
                         confirmPasswordField,
+                        checkBox,
                         const SizedBox(
                           height: 25,
                         ),

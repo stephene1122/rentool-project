@@ -120,6 +120,15 @@ class _PeopleState extends State<People> {
                   itemBuilder: (_, index) {
                     return GestureDetector(
                       onTap: () {
+                        var vfriendUid =
+                            snapshot.data!.docChanges[index].doc['uid'];
+                        var vfriendName =
+                            snapshot.data!.docChanges[index].doc['fullName'];
+                        var vfriendEmail = snapshot
+                            .data!.docChanges[index].doc['emailAddress'];
+                        var vfriendContactNumber = snapshot
+                            .data!.docChanges[index].doc['contactNumber'];
+
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -133,8 +142,29 @@ class _PeopleState extends State<People> {
                                           .docChanges[index]
                                           .doc['emailAddress'],
                                     )));
-                        print(
-                            "${snapshot.data!.docChanges[index].doc.reference.id}");
+                        // adding chat friend list
+                        if (vfriendUid != currentUser) {
+                          FirebaseFirestore.instance
+                              .collection("users")
+                              .doc(currentUser)
+                              .collection("chatted-friend")
+                              .add({
+                            "uid": vfriendUid,
+                            "friend-chat-name": vfriendName,
+                            "friend-chat-contact": vfriendEmail,
+                            "friend-chat-email": vfriendContactNumber,
+                            "dateCreated": DateTime.now(),
+                          }).then((value) {
+                            FirebaseFirestore.instance
+                                .collection("users")
+                                .doc(currentUser)
+                                .collection("chatted-friend")
+                                .doc(value.id)
+                                .update({
+                              "id": value.id,
+                            });
+                          });
+                        }
                       },
                       child: Column(
                         children: [

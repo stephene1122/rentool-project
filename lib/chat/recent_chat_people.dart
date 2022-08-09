@@ -183,13 +183,12 @@ class _RecentChatPeopleState extends State<RecentChatPeople> {
     );
   }
 
-  Widget buildRentalButton() => FloatingActionButton.extended(
-        label: const Text("Person"),
+  Widget buildRentalButton() => FloatingActionButton(
         onPressed: () {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => People()));
         },
-        icon: const Icon(Icons.add_rounded),
+        child: const Icon(Icons.person_add_alt_rounded),
         backgroundColor: HexColor("#E4B43D"),
       );
 }

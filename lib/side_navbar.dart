@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:rentool/admin/lended_items_list.dart';
+import 'package:rentool/screens/transaction_list.dart';
 import 'package:rentool/screens/user_validation_table.dart';
 import 'package:rentool/screens/validated_users_datatable.dart';
 
@@ -40,16 +42,16 @@ class SideNavBar extends StatelessWidget {
           //   onTap: () => null,
           // ),
           ListTile(
-            leading: const Icon(Icons.share),
+            leading: const Icon(Icons.verified_user_outlined),
             title: const Text("Validated Users"),
-            onTap: () => Navigator.push(context,
+            onTap: () => Navigator.of(context, rootNavigator: true).push(
                 MaterialPageRoute(builder: (context) => VerifiedUserList())),
           ),
           ListTile(
-            leading: const Icon(Icons.notifications),
+            leading: const Icon(Icons.people_alt_outlined),
             title: const Text("New Users"),
-            onTap: () => Navigator.push(context,
-                MaterialPageRoute(builder: (context) => NewUsersTable())),
+            onTap: () => Navigator.of(context, rootNavigator: true)
+                .push(MaterialPageRoute(builder: (context) => NewUsersTable())),
             // trailing: ClipOval(
             //   child: Container(
             //     color: Colors.red,
@@ -63,6 +65,18 @@ class SideNavBar extends StatelessWidget {
             //     ),
             //   ),
             // ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.pending_actions_outlined),
+            title: const Text("Active Lended Items"),
+            onTap: () => Navigator.of(context, rootNavigator: true).push(
+                MaterialPageRoute(builder: (context) => ActiveLendedItems())),
+          ),
+          ListTile(
+            leading: const Icon(Icons.list_alt_rounded),
+            title: const Text("Transaction List"),
+            onTap: () => Navigator.of(context, rootNavigator: true).push(
+                MaterialPageRoute(builder: (context) => TransactionList())),
           ),
           // const Divider(),
           // ListTile(

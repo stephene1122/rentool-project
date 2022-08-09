@@ -192,257 +192,252 @@ class _PlaceRentDetailsState extends State<PlaceRentDetails> {
         ),
         title: const Text("Rent Details"),
       ),
-      body: Container(
-        child: Center(
-          child: SingleChildScrollView(
-            reverse: true,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                  maxHeight: screenHeightMinusAppBarMinusStatusBar),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10, bottom: 10),
-                    child: SizedBox(
-                        height: 85,
-                        child: Image.asset(
-                          "assets/logo.png",
-                          fit: BoxFit.contain,
-                        )),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(6),
-                          color: buildMaterialColor(const Color(0xFFE3B13B)),
-                          border: Border.all(
-                              color:
-                                  buildMaterialColor(const Color(0xFFC35E12))),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              children: [
-                                TextFormField(
-                                  controller: lendItemDeliveryAddressController,
-                                  keyboardType: TextInputType.name,
-                                  textInputAction: TextInputAction.next,
-                                  textAlign: TextAlign.center,
-                                  validator: (value) {
-                                    if (value!.isEmpty || value.length < 1) {
-                                      return 'Delivery cannot be empty';
-                                    }
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: "Delivery Address",
-                                    contentPadding: const EdgeInsets.only(
-                                        top: 5, bottom: 5),
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(6)),
-                                    enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(6),
-                                        borderSide: BorderSide(
-                                            width: 2,
-                                            color: buildMaterialColor(
-                                                const Color(0xFFC35E12)))),
-                                  ),
+      body: Center(
+        child: SingleChildScrollView(
+          reverse: true,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+                maxHeight: screenHeightMinusAppBarMinusStatusBar - 90),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 10),
+                  child: SizedBox(
+                      height: 85,
+                      child: Image.asset(
+                        "assets/logo.png",
+                        fit: BoxFit.contain,
+                      )),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(6),
+                        color: buildMaterialColor(const Color(0xFFE3B13B)),
+                        border: Border.all(
+                            color: buildMaterialColor(const Color(0xFFC35E12))),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            children: [
+                              TextFormField(
+                                controller: lendItemDeliveryAddressController,
+                                keyboardType: TextInputType.name,
+                                textInputAction: TextInputAction.next,
+                                textAlign: TextAlign.center,
+                                validator: (value) {
+                                  if (value!.isEmpty || value.length < 1) {
+                                    return 'Delivery cannot be empty';
+                                  }
+                                },
+                                decoration: InputDecoration(
+                                  hintText: "Delivery Address",
+                                  contentPadding:
+                                      const EdgeInsets.only(top: 5, bottom: 5),
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6)),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: buildMaterialColor(
+                                              const Color(0xFFC35E12)))),
                                 ),
-                                const SizedBox(
-                                  height: 10,
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              TextFormField(
+                                maxLines: 7,
+                                controller: lendItemMessageLenderController,
+                                keyboardType: TextInputType.name,
+                                textInputAction: TextInputAction.done,
+                                textAlign: TextAlign.center,
+                                decoration: InputDecoration(
+                                  hintText: "Message Lender(Optional)",
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6)),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: buildMaterialColor(
+                                              const Color(0xFFC35E12)))),
                                 ),
-                                TextFormField(
-                                  maxLines: 7,
-                                  controller: lendItemMessageLenderController,
-                                  keyboardType: TextInputType.name,
-                                  textInputAction: TextInputAction.done,
-                                  textAlign: TextAlign.center,
-                                  decoration: InputDecoration(
-                                    hintText: "Message Lender(Optional)",
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(6)),
-                                    enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(6),
-                                        borderSide: BorderSide(
-                                            width: 2,
-                                            color: buildMaterialColor(
-                                                const Color(0xFFC35E12)))),
-                                  ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              TextFormField(
+                                readOnly: true,
+                                controller: lendItemPaymentMethodController,
+                                keyboardType: TextInputType.number,
+                                textInputAction: TextInputAction.next,
+                                textAlign: TextAlign.center,
+                                validator: (value) {
+                                  if (value!.isEmpty || value.length < 1) {
+                                    return 'Payment Method cannot be empty';
+                                  }
+                                },
+                                decoration: InputDecoration(
+                                  hintText: "Payment Method",
+                                  contentPadding:
+                                      const EdgeInsets.only(top: 5, bottom: 5),
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6)),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: buildMaterialColor(
+                                              const Color(0xFFC35E12)))),
                                 ),
-                                const SizedBox(
-                                  height: 10,
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                padding:
+                                    const EdgeInsets.only(top: 15, bottom: 15),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(6),
+                                  color: buildMaterialColor(
+                                      const Color(0xFFE3B13B)),
+                                  border: Border.all(
+                                      width: 2,
+                                      color: buildMaterialColor(
+                                          const Color(0xFFC35E12))),
                                 ),
-                                TextFormField(
-                                  readOnly: true,
-                                  controller: lendItemPaymentMethodController,
-                                  keyboardType: TextInputType.number,
-                                  textInputAction: TextInputAction.next,
-                                  textAlign: TextAlign.center,
-                                  validator: (value) {
-                                    if (value!.isEmpty || value.length < 1) {
-                                      return 'Payment Method cannot be empty';
-                                    }
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: "Payment Method",
-                                    contentPadding: const EdgeInsets.only(
-                                        top: 5, bottom: 5),
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(6)),
-                                    enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(6),
-                                        borderSide: BorderSide(
-                                            width: 2,
-                                            color: buildMaterialColor(
-                                                const Color(0xFFC35E12)))),
-                                  ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Rent Subtotal: ₱${lendedItemDetails.subtotalPayment}",
+                                      style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      "Shipping Payment: ₱${lendedItemDetails.shippingPayment}",
+                                      style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      "Total Payment: ₱${lendedItemDetails.totalPayment}",
+                                      style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Container(
-                                  alignment: Alignment.center,
-                                  padding: const EdgeInsets.only(
-                                      top: 15, bottom: 15),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(6),
-                                    color: buildMaterialColor(
-                                        const Color(0xFFE3B13B)),
-                                    border: Border.all(
-                                        width: 2,
-                                        color: buildMaterialColor(
-                                            const Color(0xFFC35E12))),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "Rent Subtotal: ₱${lendedItemDetails.subtotalPayment}",
-                                        style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                        "Shipping Payment: ₱${lendedItemDetails.shippingPayment}",
-                                        style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                        "Total Payment: ₱${lendedItemDetails.totalPayment}",
-                                        style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Material(
-                                    elevation: 5,
-                                    borderRadius: BorderRadius.circular(30),
-                                    color: HexColor("#C35E12"),
-                                    child: MaterialButton(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          20, 5, 20, 5),
-                                      minWidth: 350,
-                                      onPressed: () async {
-                                        String title =
-                                            "Congrats, you have a borrower";
-                                        String body =
-                                            "User wants to borrow your item";
-                                        if (lendItemDeliveryAddressController
-                                                .text ==
-                                            "") {
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) =>
-                                                  const AlertDialog(
-                                                    backgroundColor: Colors.red,
-                                                    contentPadding:
-                                                        EdgeInsets.fromLTRB(
-                                                            20, 23, 20, 23),
-                                                    title: Center(
-                                                        child: Text(
-                                                      "ALERT!",
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Material(
+                                  elevation: 5,
+                                  borderRadius: BorderRadius.circular(30),
+                                  color: HexColor("#C35E12"),
+                                  child: MaterialButton(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(20, 5, 20, 5),
+                                    minWidth: 350,
+                                    onPressed: () async {
+                                      String title =
+                                          "Congrats, you have a borrower";
+                                      String body =
+                                          "User wants to borrow your item. \n Tap for more details";
+                                      if (lendItemDeliveryAddressController
+                                              .text ==
+                                          "") {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) =>
+                                                const AlertDialog(
+                                                  backgroundColor: Colors.red,
+                                                  contentPadding:
+                                                      EdgeInsets.fromLTRB(
+                                                          20, 23, 20, 23),
+                                                  title: Center(
+                                                      child: Text(
+                                                    "ALERT!",
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  )),
+                                                  content: Text(
+                                                      "Please input your delivery address!",
                                                       style: TextStyle(
-                                                          color: Colors.white),
-                                                    )),
-                                                    content: Text(
-                                                        "Please input your delivery address!",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white)),
-                                                  ));
-                                        } else {
-                                          postLendedItem(
-                                              lenderDetails.uid,
-                                              lenderDetails.emailAddress,
-                                              lenderDetails.fullName,
-                                              widget.refId);
+                                                          color: Colors.white)),
+                                                ));
+                                      } else {
+                                        postLendedItem(
+                                            lenderDetails.uid,
+                                            lenderDetails.emailAddress,
+                                            lenderDetails.fullName,
+                                            widget.refId);
 
-                                          sendPushMessage(nToken!, body, title);
+                                        sendPushMessage(nToken!, body, title);
 
-                                          FirebaseFirestore firebaseFirestore =
-                                              FirebaseFirestore.instance;
+                                        FirebaseFirestore firebaseFirestore =
+                                            FirebaseFirestore.instance;
 
-                                          User? user =
-                                              FirebaseAuth.instance.currentUser;
+                                        User? user =
+                                            FirebaseAuth.instance.currentUser;
 
-                                          NotificationModel notifModel =
-                                              NotificationModel();
-                                          // writing all values
-                                          notifModel.title = title;
-                                          notifModel.body = body;
-                                          notifModel.from = user!.uid;
-                                          notifModel.to = widget.lenderUid;
+                                        NotificationModel notifModel =
+                                            NotificationModel();
+                                        // writing all values
+                                        notifModel.title = title;
+                                        notifModel.body = body;
+                                        notifModel.from = user!.uid;
+                                        notifModel.to = widget.lenderUid;
 
-                                          await firebaseFirestore
+                                        await firebaseFirestore
+                                            .collection("notifications")
+                                            .add(notifModel.toMap())
+                                            .then((value) {
+                                          FirebaseFirestore.instance
                                               .collection("notifications")
-                                              .add(notifModel.toMap())
-                                              .then((value) {
-                                            FirebaseFirestore.instance
-                                                .collection("notifications")
-                                                .doc(value.id)
-                                                .update({
-                                              'id': value.id,
-                                              'typeId': 4,
-                                              'lend-item-id': widget.refId
-                                            });
+                                              .doc(value.id)
+                                              .update({
+                                            'id': value.id,
+                                            'typeId': 4,
+                                            'lend-item-id': widget.refId
                                           });
-                                        }
-                                      },
-                                      child: const Text(
-                                        "Place Order",
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                    ))
-                              ],
-                            ),
+                                        });
+                                      }
+                                    },
+                                    child: const Text(
+                                      "Place Order",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ))
+                            ],
                           ),
                         ),
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -471,14 +466,15 @@ class _PlaceRentDetailsState extends State<PlaceRentDetails> {
       "status": "pending",
     });
     Fluttertoast.showToast(msg: "created");
-    Navigator.push(
-        (context),
+
+    Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
             builder: (context) => ContactLender(
                   refId: refId!,
                   lenderUid: uid,
                   lenderEmail: email,
                   lenderName: name,
-                )));
+                )),
+        ((route) => false));
   }
 }

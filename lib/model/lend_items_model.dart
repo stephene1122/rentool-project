@@ -17,26 +17,33 @@ class LendItemModel {
   String? rentCountDown;
   String? extendPrice;
   String? serviceFee;
+  String? extendedDay;
+  String? id;
+  String? lenderUid;
 
-  LendItemModel(
-      {this.uid,
-      this.itemId,
-      this.lendItemQuantity,
-      this.dayLended,
-      this.lendMessage,
-      this.deliveryAddress,
-      this.paymentMethod,
-      this.shippingPayment,
-      this.subtotalPayment,
-      this.totalPayment,
-      this.dateCreated,
-      this.rentPeriod,
-      this.rentPeriodFrom,
-      this.rentPeriodTo,
-      this.status,
-      this.rentCountDown,
-      this.extendPrice,
-      this.serviceFee});
+  LendItemModel({
+    this.uid,
+    this.itemId,
+    this.lendItemQuantity,
+    this.dayLended,
+    this.lendMessage,
+    this.deliveryAddress,
+    this.paymentMethod,
+    this.shippingPayment,
+    this.subtotalPayment,
+    this.totalPayment,
+    this.dateCreated,
+    this.rentPeriod,
+    this.rentPeriodFrom,
+    this.rentPeriodTo,
+    this.status,
+    this.rentCountDown,
+    this.extendPrice,
+    this.serviceFee,
+    this.extendedDay,
+    this.id,
+    this.lenderUid,
+  });
 
   // taking data from server
   factory LendItemModel.fromMap(map) {
@@ -56,6 +63,11 @@ class LendItemModel {
       rentPeriodTo: map['rentPeriodTo'],
       status: map['status'],
       rentCountDown: map['rentCountDown'],
+      extendedDay: map['extendedDay'],
+      serviceFee: map['serviceFee'],
+      extendPrice: map['extendPrice'],
+      id: map['id'],
+      lenderUid: map['lenderUid'],
     );
   }
 
@@ -77,8 +89,11 @@ class LendItemModel {
       'rentPeriodTo': rentPeriodTo,
       'status': status,
       'rentCountDown': rentCountDown,
-      'extendPrice': "extendPrice",
-      'serviceFee': "serviceFee",
+      'extendPrice': extendPrice,
+      'serviceFee': serviceFee,
+      'extendedDay': extendedDay,
+      'id': id,
+      'lenderUid': lenderUid,
       'dateCreated': DateTime.now(),
     };
   }
