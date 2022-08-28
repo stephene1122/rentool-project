@@ -141,7 +141,7 @@ class _LendItemsScreenState extends State<LendItemsScreen> {
               );
             }
             return Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15),
+              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 20),
               child: SafeArea(
                 child: Container(
                   decoration: BoxDecoration(
@@ -188,7 +188,10 @@ class _LendItemsScreenState extends State<LendItemsScreen> {
                               height: 20,
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(left: 3, right: 3),
+                              padding: const EdgeInsets.only(
+                                left: 3,
+                                right: 3,
+                              ),
                               child: ListTile(
                                   tileColor: HexColor("#E3B13B"),
                                   shape: RoundedRectangleBorder(

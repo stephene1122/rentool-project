@@ -198,7 +198,7 @@ class _HomeScreenDefaultState extends State<HomeScreenDefault> {
   }
 
   Widget buildRentalButton() => FloatingActionButton.extended(
-        label: const Text("Your Items"),
+        label: const Text("My Items"),
         onPressed: () {
           Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
               builder: (context) => LendedItems(userId: loggedInUser.uid)));

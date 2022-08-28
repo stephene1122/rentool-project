@@ -55,7 +55,7 @@ class _BorrowItemsListState extends State<BorrowItemsList> {
         child: const Icon(Icons.add),
       ),
       appBar: AppBar(
-        title: const Text("Your Borrowed Items"),
+        title: const Text("My Borrowed Items"),
         leading: IconButton(
             icon: const Icon(
               Icons.arrow_back,

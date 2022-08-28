@@ -944,8 +944,11 @@ class _BorrowitemDetails2State extends State<BorrowitemDetails2> {
               ),
               // passing this to our root
               onPressed: () {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => HomeScreenDefault()));
+                // Navigator.of(context).pushReplacement(MaterialPageRoute(
+                //     builder: (context) => NavigationBarScreen(
+                //           tabIndex: 2,
+                //         )));
+                Navigator.pop(context);
               }),
         ),
         body: Center(

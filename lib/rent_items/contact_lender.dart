@@ -55,16 +55,17 @@ class _ContactLenderState extends State<ContactLender> {
           .get()
           .then((d) {
         rentItemDetails = RentItemModel.fromMap(d.data());
-        setState(() {});
+        setState(() {
+          FirebaseFirestore.instance
+              .collection("users")
+              .doc(user!.uid)
+              .get()
+              .then((value) {
+            borrowerInfo = UserModel.fromMap(value.data());
+          });
+          setState(() {});
+        });
       });
-      FirebaseFirestore.instance
-          .collection("users")
-          .doc(user!.uid)
-          .get()
-          .then((value) {
-        borrowerInfo = UserModel.fromMap(value.data());
-      });
-      setState(() {});
     });
   }
 
@@ -116,8 +117,8 @@ class _ContactLenderState extends State<ContactLender> {
                         TextFormField(
                             readOnly: true,
                             autofocus: false,
-                            controller: TextEditingController(
-                                text: borrowerInfo.fullName),
+                            controller:
+                                TextEditingController(text: widget.lenderName),
                             textInputAction: TextInputAction.next,
                             decoration: InputDecoration(
                                 enabledBorder: OutlineInputBorder(
@@ -131,7 +132,7 @@ class _ContactLenderState extends State<ContactLender> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(6),
                                 ),
-                                labelText: "BORROWER NAME")),
+                                labelText: "LENDER  NAME")),
                         const SizedBox(
                           height: 15,
                         ),
@@ -206,6 +207,28 @@ class _ContactLenderState extends State<ContactLender> {
                             readOnly: true,
                             autofocus: false,
                             controller: TextEditingController(
+                                text: borrowerInfo.fullName),
+                            textInputAction: TextInputAction.next,
+                            decoration: InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color:
+                                          buildMaterialColor(Color(0xFFC35E12)),
+                                      width: 2.0),
+                                ),
+                                contentPadding:
+                                    const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                labelText: "BORROWER NAME")),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        TextFormField(
+                            readOnly: true,
+                            autofocus: false,
+                            controller: TextEditingController(
                                 text: lendItemDetails.deliveryAddress),
                             textInputAction: TextInputAction.next,
                             decoration: InputDecoration(
@@ -220,7 +243,7 @@ class _ContactLenderState extends State<ContactLender> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(6),
                                 ),
-                                labelText: "DELIVERY ADDRESS")),
+                                labelText: "BORROWER ADDRESS")),
                         const SizedBox(
                           height: 15,
                         ),

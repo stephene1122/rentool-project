@@ -701,17 +701,17 @@ class _BorrowitemDetailsState extends State<BorrowitemDetails> {
                         TextButton(
                             onPressed: () async {
                               // update the for rent item quantity
-                              // var lendedItemQuantity =
-                              //     int.parse(lendItemDetails.lendItemQuantity!);
-                              // var cRentItemQuantity =
-                              //     int.parse(rentItemDetails.itemQuantity!);
-                              // int com = lendedItemQuantity + cRentItemQuantity;
-                              // await FirebaseFirestore.instance
-                              //     .collection("rent-items")
-                              //     .doc(lendItemDetails.itemId)
-                              //     .update({
-                              //   "itemQuantity": com.toString(),
-                              // });
+                              var lendedItemQuantity =
+                                  int.parse(lendItemDetails.lendItemQuantity!);
+                              var cRentItemQuantity =
+                                  int.parse(rentItemDetails.itemQuantity!);
+                              int com = lendedItemQuantity + cRentItemQuantity;
+                              await FirebaseFirestore.instance
+                                  .collection("rent-items")
+                                  .doc(lendItemDetails.itemId)
+                                  .update({
+                                "itemQuantity": com.toString(),
+                              });
 
                               // update lend-items status into expired to notify the lender
                               await FirebaseFirestore.instance

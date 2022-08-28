@@ -457,7 +457,7 @@ class _ItemDetailsState extends State<ItemDetails> {
                     )));
       });
 
-      Fluttertoast.showToast(msg: "created");
+      // Fluttertoast.showToast(msg: "created");
     }
   }
 }

@@ -197,7 +197,7 @@ class _PlaceRentDetailsState extends State<PlaceRentDetails> {
           reverse: true,
           child: ConstrainedBox(
             constraints: BoxConstraints(
-                maxHeight: screenHeightMinusAppBarMinusStatusBar - 90),
+                maxHeight: screenHeightMinusAppBarMinusStatusBar),
             child: Column(
               children: [
                 Padding(
@@ -465,7 +465,7 @@ class _PlaceRentDetailsState extends State<PlaceRentDetails> {
       "paymentMethod": lendItemPaymentMethodController.text,
       "status": "pending",
     });
-    Fluttertoast.showToast(msg: "created");
+    // Fluttertoast.showToast(msg: "created");
 
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(

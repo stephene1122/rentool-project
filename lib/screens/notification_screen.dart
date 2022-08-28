@@ -6,6 +6,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:rentool/notifications/return_item.dart';
 import 'package:rentool/rent_items/contact_borrower.dart';
 import 'package:rentool/screens/home_screen.dart';
+import 'package:rentool/screens/navigation_bar.dart';
 import 'package:rentool/screens/transaction_granted.dart';
 import 'package:rentool/screens/user_validation_table.dart';
 
@@ -179,6 +180,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
   //   print("object");
   // }
 
+  Future<void> refresh() {
+    return Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => NavigationBarScreen(
+              tabIndex: 2,
+            )));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -215,130 +223,135 @@ class _NotificationScreenState extends State<NotificationScreen> {
       //   icon: const Icon(Icons.construction_rounded),
       //   backgroundColor: HexColor("#E4B43D"),
       // ),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection("notifications")
-            .where("to", isEqualTo: user!.uid)
-            .orderBy("dateCreated")
-            .snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(
-              child: Text("No notification"),
-            );
-          }
-          if (snapshot.hasError) {
-            print("Something wrong!");
-          }
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          return Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15, bottom: 20),
-            child: SafeArea(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  reverse: true,
-                  itemCount: snapshot.data!.docs.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        var typeId =
-                            snapshot.data!.docChanges[index].doc['typeId'];
-                        if (typeId == 4) {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => ContactBorrower(
-                                    borrowerUid: snapshot
-                                        .data!.docChanges[index].doc['from'],
-                                    refId: snapshot.data!.docChanges[index]
-                                        .doc['lend-item-id'],
-                                  )));
-                        } else if (typeId == 5) {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => TransactionGrantedDetails(
-                                    lenderUid: snapshot
-                                        .data!.docChanges[index].doc['from'],
-                                    refId: snapshot.data!.docChanges[index]
-                                        .doc['lend-item-id'],
-                                  )));
-                        } else if (typeId == 6) {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => ReturnItemNotification(
-                                    borrowerUid: snapshot
-                                        .data!.docChanges[index].doc['from'],
-                                    refId: snapshot.data!.docChanges[index]
-                                        .doc['lend-item-id'],
-                                  )));
-                          print(6);
-                          print(snapshot.data!.docChanges[index].doc['from']);
-                          print(snapshot
-                              .data!.docChanges[index].doc['lend-item-id']);
-                        } else if (typeId == 1) {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => const NewUsersTable()));
-                        } else {
-                          print(
-                              "${snapshot.data!.docChanges[index].doc.reference.id}");
-                          print(1);
-                        }
-                      },
-                      child: Column(
-                        children: [
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              left: 3,
-                              right: 3,
+      body: RefreshIndicator(
+        onRefresh: refresh,
+        child: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection("notifications")
+              .where("to", isEqualTo: user!.uid)
+              .orderBy("dateCreated", descending: true)
+              .snapshots(),
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(
+                child: Text("No notification"),
+              );
+            }
+            if (snapshot.hasError) {
+              print("Something wrong!");
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return Padding(
+              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 20),
+              child: SafeArea(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    // reverse: true,
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          var typeId =
+                              snapshot.data!.docChanges[index].doc['typeId'];
+                          if (typeId == 4) {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => ContactBorrower(
+                                      borrowerUid: snapshot
+                                          .data!.docChanges[index].doc['from'],
+                                      refId: snapshot.data!.docChanges[index]
+                                          .doc['lend-item-id'],
+                                    )));
+                          } else if (typeId == 5) {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => TransactionGrantedDetails(
+                                      lenderUid: snapshot
+                                          .data!.docChanges[index].doc['from'],
+                                      refId: snapshot.data!.docChanges[index]
+                                          .doc['lend-item-id'],
+                                    )));
+                          } else if (typeId == 6) {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => ReturnItemNotification(
+                                      borrowerUid: snapshot
+                                          .data!.docChanges[index].doc['from'],
+                                      refId: snapshot.data!.docChanges[index]
+                                          .doc['lend-item-id'],
+                                    )));
+                            print(6);
+                            print(snapshot.data!.docChanges[index].doc['from']);
+                            print(snapshot
+                                .data!.docChanges[index].doc['lend-item-id']);
+                          } else if (typeId == 1) {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => const NewUsersTable()));
+                          } else {
+                            print(
+                                "${snapshot.data!.docChanges[index].doc.reference.id}");
+                            print(1);
+                          }
+                        },
+                        child: Column(
+                          children: [
+                            const SizedBox(
+                              height: 20,
                             ),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 6),
-                              tileColor: HexColor("#E3B13B"),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(3),
-                                  side: BorderSide(color: HexColor("#C35E12"))),
-                              title: Text(
-                                "${snapshot.data!.docChanges[index].doc['title']}",
-                                style: const TextStyle(fontSize: 20),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                left: 3,
+                                right: 3,
                               ),
-                              // leading: Text(
-                              //     "${snapshot.data!.docChanges[index].doc['to']}"),
-                              subtitle: Text(
-                                "${snapshot.data!.docChanges[index].doc['body']}",
-                                style: const TextStyle(fontSize: 16),
-                                maxLines: 4,
-                                overflow: TextOverflow.ellipsis,
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 8, horizontal: 6),
+                                tileColor: HexColor("#E3B13B"),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(3),
+                                    side:
+                                        BorderSide(color: HexColor("#C35E12"))),
+                                title: Text(
+                                  "${snapshot.data!.docChanges[index].doc['title']}",
+                                  style: const TextStyle(fontSize: 20),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                // leading: Text(
+                                //     "${snapshot.data!.docChanges[index].doc['to']}"),
+                                subtitle: Text(
+                                  "${snapshot.data!.docChanges[index].doc['body']}",
+                                  style: const TextStyle(fontSize: 16),
+                                  maxLines: 4,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                // trailing: Column(
+                                //   crossAxisAlignment: CrossAxisAlignment.center,
+                                //   children: [
+                                //     Text(
+                                //       "Price: ${snapshot.data!.docChanges[index].doc['dateCreated']} ",
+                                //       style: const TextStyle(fontSize: 15),
+                                //     )
+                                //   ],
+                                // )
                               ),
-                              // trailing: Column(
-                              //   crossAxisAlignment: CrossAxisAlignment.center,
-                              //   children: [
-                              //     Text(
-                              //       "Price: ${snapshot.data!.docChanges[index].doc['dateCreated']} ",
-                              //       style: const TextStyle(fontSize: 15),
-                              //     )
-                              //   ],
-                              // )
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

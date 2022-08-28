@@ -57,7 +57,7 @@ class _RentedItemsListState extends State<RentedItemsList> {
       //   },
       //   child: const Icon(Icons.add),
       // ),
-      appBar: AppBar(title: const Text("Your Lended Items")),
+      appBar: AppBar(title: const Text("My Lended Items")),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection("lend-items")

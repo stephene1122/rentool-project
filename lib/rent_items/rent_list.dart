@@ -16,6 +16,10 @@ class LendedItems extends StatefulWidget {
 }
 
 class _LendedItemsState extends State<LendedItems> {
+  Future<void> refresh() {
+    return Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (BuildContext context) => super.widget));
+  }
   // final Stream<QuerySnapshot> _userStream = FirebaseFirestore.instance
   //     .collection("rent-items")
   //     .where("uid", isEqualTo: "${widget.userId}")
@@ -63,97 +67,102 @@ class _LendedItemsState extends State<LendedItems> {
         child: const Icon(Icons.add),
       ),
       appBar: AppBar(
-        title: const Text("Your Items"),
+        title: const Text("My Items"),
         leading: IconButton(
             icon: const Icon(
               Icons.arrow_back,
             ),
             // passing this to our root
             onPressed: () {
-              Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) => NavigationBarScreen(
-                        tabIndex: 3,
-                      )));
+              // Navigator.of(context).pushReplacement(MaterialPageRoute(
+              //     builder: (context) => NavigationBarScreen(
+              //           tabIndex: 3,
+              //         )));
+              Navigator.pop(context);
             }),
       ),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection("rent-items")
-            .where("uid", isEqualTo: "${widget.userId}")
-            .snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) {
-            return const Text("something wrong");
-          }
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
+      body: RefreshIndicator(
+        onRefresh: refresh,
+        child: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection("rent-items")
+              .where("uid", isEqualTo: "${widget.userId}")
+              .snapshots(),
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return const Text("something wrong");
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ListView.builder(
+                itemCount: snapshot.data!.docs.length,
+                itemBuilder: (BuildContext context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context, rootNavigator: true)
+                          .push(MaterialPageRoute(
+                              builder: (_) => EditRentItem(
+                                    docId: snapshot.data!.docs[index],
+                                  )));
+                      // print(
+                      //     "${snapshot.data!.docChanges[index].doc.reference.id}");
+                    },
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 3, right: 3),
+                          child: ListTile(
+                              tileColor: HexColor("#E3B13B"),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(3),
+                                  side: BorderSide(color: HexColor("#C35E12"))),
+                              title: Text(
+                                "${snapshot.data!.docChanges[index].doc['itemName']}",
+                                style: const TextStyle(fontSize: 20),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              leading: _imageItem(
+                                refId: snapshot
+                                    .data!.docChanges[index].doc.reference.id,
+                              ),
+                              subtitle: Text(
+                                "Rating: ${snapshot.data!.docChanges[index].doc['ratings']}",
+                                style: const TextStyle(fontSize: 16),
+                                maxLines: 4,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 12, horizontal: 16),
+                              trailing: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Price: ${snapshot.data!.docChanges[index].doc['itemPrice']} \n\nQuantity: ${snapshot.data!.docChanges[index].doc['itemQuantity']}",
+                                    style: const TextStyle(fontSize: 15),
+                                  )
+                                ],
+                              )),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             );
-          }
-          return Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: ListView.builder(
-              itemCount: snapshot.data!.docs.length,
-              itemBuilder: (BuildContext context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.of(context, rootNavigator: true)
-                        .push(MaterialPageRoute(
-                            builder: (_) => EditRentItem(
-                                  docId: snapshot.data!.docs[index],
-                                )));
-                    // print(
-                    //     "${snapshot.data!.docChanges[index].doc.reference.id}");
-                  },
-                  child: Column(
-                    children: [
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 3, right: 3),
-                        child: ListTile(
-                            tileColor: HexColor("#E3B13B"),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(3),
-                                side: BorderSide(color: HexColor("#C35E12"))),
-                            title: Text(
-                              "${snapshot.data!.docChanges[index].doc['itemName']}",
-                              style: const TextStyle(fontSize: 20),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            leading: _imageItem(
-                              refId: snapshot
-                                  .data!.docChanges[index].doc.reference.id,
-                            ),
-                            subtitle: Text(
-                              "Rating: ${snapshot.data!.docChanges[index].doc['ratings']}",
-                              style: const TextStyle(fontSize: 16),
-                              maxLines: 4,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 12, horizontal: 16),
-                            trailing: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Price: ${snapshot.data!.docChanges[index].doc['itemPrice']} \n\nQuantity: ${snapshot.data!.docChanges[index].doc['itemQuantity']}",
-                                  style: const TextStyle(fontSize: 15),
-                                )
-                              ],
-                            )),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          );
-        },
+          },
+        ),
       ),
     );
   }
